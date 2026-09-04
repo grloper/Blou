@@ -1,0 +1,9 @@
+.pipeline/
+.obsidian_vault/
+*.pyc
+__pycache__/
+build/
+.gradle/
+local.properties
+*.log
+*.tmp

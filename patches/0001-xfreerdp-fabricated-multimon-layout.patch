@@ -1,0 +1,85 @@
+From 63b948ca5cb94307fd5444ee6e73927a41ccdab4 Mon Sep 17 00:00:00 2001
+From: Blou Project <blou@local>
+Date: Fri, 4 Sep 2026 18:30:00 +0300
+Subject: [PATCH 1/2] x11: inject fabricated multi-monitor layout behind BLOU_FAKE_MONITORS
+
+Enables declaring an arbitrary multi-monitor topology to the RDP server
+regardless of the client's actual connected physical displays.
+When BLOU_FAKE_MONITORS=1, announces 3x 1920x1080 monitors side-by-side
+(bounding box 5760x1080) with primary at (0,0).
+---
+ client/X11/xf_monitor.c | 59 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 59 insertions(+)
+
+diff --git a/client/X11/xf_monitor.c b/client/X11/xf_monitor.c
+index 656c82c..64a425f 100644
+--- a/client/X11/xf_monitor.c
++++ b/client/X11/xf_monitor.c
+@@ -165,6 +165,65 @@ BOOL xf_detect_monitors(xfContext* xfc, UINT32* pMaxWidth, UINT32* pMaxHeight)
+ 	rdpSettings* settings = xfc->common.context.settings;
+ 	VIRTUAL_SCREEN* vscreen = &xfc->vscreen;
+ 
++	const char* fake_mon = getenv("BLOU_FAKE_MONITORS");
++	if (fake_mon)
++	{
++		UINT32 count = 3;
++		UINT32 m_w = 1920;
++		UINT32 m_h = 1080;
++		rdpMonitor* fake_monitors = calloc(count, sizeof(rdpMonitor));
++		if (!fake_monitors)
++			return FALSE;
++
++		vscreen->nmonitors = count;
++		for (UINT32 i = 0; i < count; i++)
++		{
++			fake_monitors[i].x = (INT32)(i * m_w);
++			fake_monitors[i].y = 0;
++			fake_monitors[i].width = (INT32)m_w;
++			fake_monitors[i].height = (INT32)m_h;
++			fake_monitors[i].is_primary = (i == 0);
++			fake_monitors[i].orig_screen = i;
++			fake_monitors[i].attributes.physicalWidth = m_w;
++			fake_monitors[i].attributes.physicalHeight = m_h;
++			fake_monitors[i].attributes.orientation = ORIENTATION_LANDSCAPE;
++
++			vscreen->monitors[i].area.left = (UINT16)(i * m_w);
++			vscreen->monitors[i].area.top = 0;
++			vscreen->monitors[i].area.right = (UINT16)((i + 1) * m_w - 1);
++			vscreen->monitors[i].area.bottom = (UINT16)(m_h - 1);
++			vscreen->monitors[i].primary = (i == 0);
++		}
++
++		UINT32 total_w = count * m_w;
++		UINT32 total_h = m_h;
++
++		vscreen->area.left = 0;
++		vscreen->area.top = 0;
++		vscreen->area.right = (UINT16)(total_w - 1);
++		vscreen->area.bottom = (UINT16)(total_h - 1);
++
++		*pMaxWidth = total_w;
++		*pMaxHeight = total_h;
++		xfc->workArea.x = 0;
++		xfc->workArea.y = 0;
++		xfc->workArea.width = total_w;
++		xfc->workArea.height = total_h;
++
++		freerdp_settings_set_bool(settings, FreeRDP_UseMultimon, TRUE);
++		freerdp_settings_set_bool(settings, FreeRDP_ForceMultimon, TRUE);
++		freerdp_settings_set_bool(settings, FreeRDP_SupportMonitorLayoutPdu, TRUE);
++		freerdp_settings_set_uint32(settings, FreeRDP_MonitorCount, count);
++		freerdp_settings_set_uint32(settings, FreeRDP_DesktopWidth, total_w);
++		freerdp_settings_set_uint32(settings, FreeRDP_DesktopHeight, total_h);
++
++		BOOL set_rc = freerdp_settings_set_monitor_def_array_sorted(settings, fake_monitors, count);
++		free(fake_monitors);
++		WLog_INFO(TAG, "[BLOU Phase 0] Injected %u fabricated monitors (each %ux%u, bounding box %ux%u), set_rc=%d",
++		          count, m_w, m_h, total_w, total_h, set_rc);
++		return set_rc;
++	}
++
+ 	*pMaxWidth = freerdp_settings_get_uint32(settings, FreeRDP_DesktopWidth);
+ 	*pMaxHeight = freerdp_settings_get_uint32(settings, FreeRDP_DesktopHeight);
+ 
+-- 
+2.47.1

@@ -1,0 +1,15 @@
+{
+  "input_kind": "synthetic local fixture; no RDP or TLS connection",
+  "monitor_count": 3,
+  "composite_size": [
+    5760,
+    1080
+  ],
+  "active_monitor": 2,
+  "touch_100_100_maps_to": [
+    3940,
+    100
+  ],
+  "matching_synthetic_bytes": 1,
+  "malformed_peer_input": -2
+}

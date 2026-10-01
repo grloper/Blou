@@ -59,11 +59,17 @@ class CertificatePinningVerifier:
             # Non-negotiable rule: No unpinned connections. No TOFU.
             return CertificateVerificationResult.REJECTED_NO_PIN
 
-        if isinstance(cert_der_or_fingerprint, bytes):
-            presented_fp = self.compute_cert_fingerprint(cert_der_or_fingerprint)
-        elif isinstance(cert_der_or_fingerprint, str):
-            presented_fp = self.normalize_fingerprint(cert_der_or_fingerprint)
-        else:
+        try:
+            if isinstance(cert_der_or_fingerprint, bytes):
+                presented_fp = self.compute_cert_fingerprint(cert_der_or_fingerprint)
+            elif isinstance(cert_der_or_fingerprint, str):
+                presented_fp = self.normalize_fingerprint(cert_der_or_fingerprint)
+            else:
+                return CertificateVerificationResult.REJECTED_MALFORMED
+        except ValueError:
+            # Peer-controlled input must fail closed through the callback result.
+            return CertificateVerificationResult.REJECTED_MALFORMED
+        if presented_fp is None:
             return CertificateVerificationResult.REJECTED_MALFORMED
 
         if presented_fp == self.pinned_fingerprint:

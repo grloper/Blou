@@ -7,3 +7,6 @@ build/
 local.properties
 *.log
 *.tmp
+build/
+dist/
+*.spec

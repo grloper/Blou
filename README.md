@@ -1,5 +1,10 @@
 # Blou
 
+**New Windows milestone:** a consent-gated multi-monitor local desktop workbench
+now includes real JPEG capture/transport/decode and an executable build script.
+See [run instructions and verified limits](docs/WINDOWS-WORKBENCH.md).
+This loopback prototype is separate from the RDP geometry core below.
+
 ![Blou source-based implementation overview](docs/assets/overview.svg)
 
 Validate fabricated monitor layouts, map a phone viewport to a composite desktop and encode RDP display-control messages in Python.

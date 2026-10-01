@@ -49,6 +49,14 @@ class TestCertificatePinningVerifier(unittest.TestCase):
         with self.assertRaises(ValueError):
             CertificatePinningVerifier(pinned_sha256_hex="z" * 64)  # Invalid non-hex char
 
+    def test_malformed_presented_certificate_is_rejected_without_raising(self):
+        for presented in (b"", "not-a-fingerprint", "", "z" * 64, None):
+            with self.subTest(presented=presented):
+                self.assertEqual(
+                    self.verifier.verify_certificate(presented),
+                    CertificateVerificationResult.REJECTED_MALFORMED,
+                )
+
 
 class TestHardwareKeystorePolicy(unittest.TestCase):
     def test_keystore_manifest_invariants(self):

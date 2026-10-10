@@ -1,0 +1,7 @@
+# Default owner for everything; gate and test paths listed explicitly.
+*                                @grloper
+/.github/                        @grloper
+/scripts/                        @grloper
+/tests/                          @grloper
+/ruff.toml                       @grloper
+/AGENTS.md                       @grloper

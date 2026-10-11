@@ -1,6 +1,6 @@
 # Blou — executed evidence
 
-Verification date: 2026-10-01. Environment: Windows, isolated checkout and dependencies.
+Original verification date: 2026-10-01 (Windows). The suite was re-run on Linux for v0.1.0 via `scripts/verify.sh`.
 Documentation and pre-existing demo data were treated as untrusted leads. Claims below come from inspected implementation and local execution.
 
 ## Verified use case
@@ -9,7 +9,7 @@ Validate fabricated monitor layouts, map a phone viewport to a composite desktop
 
 ## Executed checks
 
-30 local unit tests passed. They verify geometry, display-control byte layouts, viewport navigation and synthetic certificate fingerprint behavior.
+36 local unit tests pass (as of the v0.1.0 release). They verify geometry, display-control byte layouts, viewport navigation and synthetic certificate fingerprint behavior.
 
 ```text
 python -m unittest discover -s tests -v
@@ -36,6 +36,6 @@ No Android client build, FreeRDP native integration, physical phone, real TLS se
 
 Useful protocol/geometry core; a working native Android RDP product is not yet established by this run. No stars, customers, revenue, accuracy or deployed-integration claims were inferred from repository size or marketing.
 
-The artwork in `docs/assets/overview.svg` is a source-based workflow illustration. Screenshots, where present, are actual local runs with synthetic input as described above. Visibility and licenses were preserved; public publication needs separate review.
+The artwork in `docs/assets/overview.svg` is a source-based workflow illustration. Screenshots, where present, are actual local runs with synthetic input as described above.
 
 The `scripts/demo_local.py` capture is a synthetic Python-core run, not a native client session.

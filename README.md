@@ -1,36 +1,68 @@
 # Blou
 
-**New Windows milestone:** a consent-gated multi-monitor local desktop workbench
-now includes real JPEG capture/transport/decode and an executable build script.
-See [run instructions and verified limits](docs/WINDOWS-WORKBENCH.md).
-This loopback prototype is separate from the RDP geometry core below.
+Blou is a pre-alpha Python project exploring **virtual multi-monitor support for a phone-sized RDP client**. The idea: the RDP client declares its monitor layout to the server, so a client can declare several virtual monitors and then let the user pan between them on a small screen.
 
-![Blou source-based implementation overview](docs/assets/overview.svg)
+**Status: early prototype.** What exists and is tested is a pure-Python protocol/geometry core and a Windows-only local desktop-capture workbench. There is **no working Android/RDP client** in this repository. The FreeRDP integration is a design plus two patches (see [Limits](#limits)).
 
-Validate fabricated monitor layouts, map a phone viewport to a composite desktop and encode RDP display-control messages in Python.
+![Blou overview](docs/assets/overview.svg)
 
-**Status:** Useful protocol/geometry core; a working native Android RDP product is not yet established by this run.
+## What is in the box
 
-## What was actually run
+| Path | What it does | Tested |
+|------|--------------|--------|
+| `src/blou/layout.py` | Virtual monitor layouts (horizontal row, 2x2 grid) and validation | unit tests |
+| `src/blou/viewport.py` | Maps phone touch coordinates to a composite desktop, swipe navigation, damage-rect clipping | unit tests |
+| `src/blou/dvc.py` | Encodes RDP display-control (MS-RDPEDISP) capability and monitor-layout PDUs | unit tests (byte layouts) |
+| `src/blou/security.py` | Certificate fingerprint pinning check; a policy manifest only (no Android Keystore code) | unit tests (synthetic data) |
+| `src/blou/desktop.py`, `scripts/blou_desktop.py` | Windows local loopback screen-preview workbench (consent gated, bearer token) | unit tests with fixtures; real capture only verified manually on Windows 11 |
+| `patches/`, `scripts/*phase0*` | FreeRDP experiments (fabricated monitor layout for `xfreerdp`) | not run in CI; see Limits |
 
-30 local unit tests passed. They verify geometry, display-control byte layouts, viewport navigation and synthetic certificate fingerprint behavior.
+The protocol core uses only the Python standard library.
 
-## Run locally
+## Quick start
 
-Commands below are local evaluation paths. Use an isolated environment. `RADAR_OFFLINE=1` is an environment-variable assignment; on PowerShell use `$env:RADAR_OFFLINE='1'` first.
+Requires Python 3.10+ (developed and verified on 3.13), `git`, and network access once for setup.
 
-```text
+```bash
+git clone https://github.com/grloper/Blou.git
+cd Blou
+scripts/setup.sh        # creates .venv, installs the project and pinned dev tools
+scripts/verify.sh       # the single gate: lint, 36 tests, offline demo, package build
+```
+
+Run just the tests:
+
+```bash
+source .venv/bin/activate
 python -m unittest discover -s tests -v
 ```
 
-## Scope you can rely on
+Run the synthetic demo (no RDP or TLS connection; rewrites `docs/verification/local-core-demo.json`):
 
-No Android client build, FreeRDP native integration, physical phone, real TLS session or Windows multimonitor RDP session was exercised. FreeRDP is an uninitialized submodule in this isolated clone. HardwareKeystorePolicy is a policy manifest, not evidence of Android Keystore enforcement.
+```bash
+python scripts/demo_local.py
+```
 
-## Evidence and changes
+Use as a library:
 
-Malformed peer certificate/fingerprint inputs now return the explicit rejection result instead of raising out of the verification callback. Added empty-byte, malformed-string and unexpected-type regressions.
+```bash
+pip install -e .
+python -c "from blou.layout import LayoutBuilder; print(LayoutBuilder.create_horizontal_row(count=3).bounding_width)"   # 5760
+```
 
-Read the [executed evidence and source map](docs/verification/README.md) for the precise distinction between tested behavior, synthetic model/data boundaries and unverified integrations. Existing design documents describe intended or historical behavior; their claims require fresh verification against code.
+The Windows workbench is described in [docs/WINDOWS-WORKBENCH.md](docs/WINDOWS-WORKBENCH.md) (`pip install -e .[desktop]`).
 
-Run `python scripts/demo_local.py` for a synthetic geometry/fingerprint demonstration with no RDP or TLS connection. The emitted [local-core-demo.json](docs/verification/local-core-demo.json) is fixture evidence.
+## Limits
+
+- No Android client build, native FreeRDP integration, physical phone, real TLS session or real multi-monitor RDP session has been exercised by the automated tests.
+- The `FreeRDP` submodule is pinned to upstream 3.31.1 (`63b948ca5`) and is optional (`scripts/setup.sh --with-freerdp`). `patches/0001-*` applies to that commit; `patches/0002-*` (Android CMake fixes) **does not apply cleanly** to it yet (tracked in [docs/ROADMAP.md](docs/ROADMAP.md)).
+- Design documents (`SPEC.md`, `ARCHITECTURE.md`, `docs/SECURITY_ARCHITECTURE.md`, `docs/PROTOCOL_INSIGHTS.md`) describe intent. Treat their claims as unverified unless backed by code and a test. IP addresses in them are placeholders.
+- Evidence and its limits: [docs/verification/README.md](docs/verification/README.md).
+
+## Project docs
+
+[ROADMAP](docs/ROADMAP.md) · [CONTRIBUTING](CONTRIBUTING.md) · [SECURITY](SECURITY.md) · [CHANGELOG](CHANGELOG.md) · [AGENTS.md](AGENTS.md) (instructions for AI coding agents)
+
+## License
+
+Apache License 2.0, see [LICENSE](LICENSE). FreeRDP (the optional submodule, also Apache-2.0) is a separate work under its own license and is not included in the Python package.

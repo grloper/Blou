@@ -9,7 +9,7 @@ In RDP, the client monitor layout is declared by the client and not verified by 
 ---
 
 ## 2. Environment & Connectivity
-- **Host**: Windows 11, IP `100.64.0.10` over Tailscale VPN, RDP port `3389`, NLA enabled.
+- **Host**: Windows 11, IP `100.64.0.10` (placeholder; use your own tailnet address) over Tailscale VPN, RDP port `3389`, NLA enabled.
 - **Firewall**: Port 3389 restricted strictly to Tailscale interface.
 - **Tailscale ACL**: Restricted to `tag:<WORKSTATION_TAG>:3389`.
 - **Client**: Android device.

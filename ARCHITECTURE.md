@@ -4,7 +4,7 @@
 
 ```
 +--------------------------------------------------------------------------------+
-| Host: Windows 11 (100.64.0.10:3389 over Tailscale)                            |
+| Host: Windows 11 (<WORKSTATION_TAILSCALE_IP>:3389 over Tailscale)              |
 |   - NLA / CredSSP Auth                                                         |
 |   - Virtual Monitor Layout received from client (e.g. 3x 1920x1080 = 5760x1080)|
 |   - Windows Virtual Desktop Engine creates 3 distinct logical displays         |

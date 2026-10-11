@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "blou"
+version = "0.1.0"
+description = "Python RDP display-control geometry, viewport mapping and certificate-fingerprint helpers (pre-alpha; no native RDP client yet)."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+authors = [{ name = "grloper" }]
+keywords = ["rdp", "remote-desktop", "multi-monitor", "display-control"]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Topic :: Software Development :: Libraries",
+]
+# The protocol core (layout, viewport, dvc, security) uses only the standard library.
+dependencies = []
+
+[project.optional-dependencies]
+# Windows local desktop workbench (blou.desktop, scripts/blou_desktop.py).
+desktop = ["Pillow==12.3.0"]
+# Everything needed to run scripts/verify.sh. Exact pins keep the gate reproducible.
+dev = [
+    "Pillow==12.3.0",
+    "ruff==0.17.0",
+    "mypy==2.4.0",
+    "build==1.6.1",
+    "setuptools==84.0.0",
+    "wheel==0.48.0",
+    "actionlint-py==1.7.12.25",
+]
+
+[project.urls]
+Homepage = "https://github.com/grloper/Blou"
+Issues = "https://github.com/grloper/Blou/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]

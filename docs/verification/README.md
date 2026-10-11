@@ -6,6 +6,7 @@ Documentation and pre-existing demo data were treated as untrusted leads. Claims
 ## Rust-first follow-ups (2026-10-11)
 
 - [FreeRDP fallback patches](freerdp-patches.md): both pinned patches apply; Android compilation remains UNVERIFIED.
+- [FreeRDP probe policy](freerdp-probe-policy.md): offline runner regression tests; live launch blocked by missing native strict pin integration.
 
 ## Verified use case
 

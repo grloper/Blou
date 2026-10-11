@@ -1,45 +1,25 @@
 From 63b948ca5cb94307fd5444ee6e73927a41ccdab4 Mon Sep 17 00:00:00 2001
-From: Blou Project <blou@local>
-Date: Fri, 4 Sep 2026 19:00:00 +0300
-Subject: [PATCH 2/2] cmake/android: fix NDK 27 CMP0057 policy and Windows path parsing
+Subject: [PATCH 2/2] cmake/android: forward IN_LIST policy and quote NDK environment
 
-- Fix CMP0057 IN_LIST policy in NDK 27 for external subprojects via CMAKE_PROJECT_INCLUDE_BEFORE
-- Normalize NDK_ROOT forward slashes and quote OSSL_ENV_PATH for Windows cmd/make execution
-- Apply patch_openssl.py to avoid 8.3 short name regex mismatch on Windows
----
- client/Android/cmake/ExternalCJSON.cmake   |  2 +-
- client/Android/cmake/ExternalDeps.cmake    |  1 +
- client/Android/cmake/ExternalOpenSSL.cmake | 20 ++++++++++++++------
- 3 files changed, 16 insertions(+), 7 deletions(-)
+Rebased on FreeRDP 3.31.1. Preserve cJSON policy minimum. No helper
+files or OpenSSL source patches. Use the native host PATH separator;
+ExternalProject LIST_SEPARATOR restores Windows semicolons.
 
-diff --git a/client/Android/cmake/ExternalCJSON.cmake b/client/Android/cmake/ExternalCJSON.cmake
-index 11dac9215..99e60331a 100644
---- a/client/Android/cmake/ExternalCJSON.cmake
-+++ b/client/Android/cmake/ExternalCJSON.cmake
-@@ -5,5 +5,5 @@ ExternalProject_Add(
-   cjson DOWNLOAD_EXTRACT_TIMESTAMP OFF SOURCE_DIR ${CMAKE_SOURCE_DIR}/external/cjson
-   URL https://github.com/DaveGamble/cJSON/archive/refs/tags/${CJSON_VERSION}.tar.gz URL_HASH ${CJSON_HASH}
-   LIST_SEPARATOR | CMAKE_ARGS ${ANDROID_CMAKE_ARGS} -DENABLE_CJSON_TEST:BOOL=OFF -DENABLE_HIDDEN_SYMBOLS:BOOL=OFF
--                              -DENABLE_CJSON_UNINSTALL:BOOL=OFF -DCMAKE_POLICY_VERSION_MINIMUM:STRING=3.5
-+                              -DENABLE_CJSON_UNINSTALL:BOOL=OFF
- )
 diff --git a/client/Android/cmake/ExternalDeps.cmake b/client/Android/cmake/ExternalDeps.cmake
-index 16081ae24..4b2dce390 100644
 --- a/client/Android/cmake/ExternalDeps.cmake
 +++ b/client/Android/cmake/ExternalDeps.cmake
-@@ -29,6 +29,7 @@ set(ANDROID_CMAKE_ARGS
+@@ -29,6 +29,7 @@
      -DCMAKE_INSTALL_BINDIR:STRING=${CMAKE_INSTALL_BINDIR}
      -DCMAKE_INSTALL_DOCDIR:STRING=${CMAKE_INSTALL_DOCDIR}
      -DCMAKE_INSTALL_INCLUDEDIR:STRING=${CMAKE_INSTALL_INCLUDEDIR}
-+    -DCMAKE_PROJECT_INCLUDE_BEFORE:FILEPATH=${CMAKE_CURRENT_LIST_DIR}/cmake_policy_compat.cmake
++    -DCMAKE_POLICY_DEFAULT_CMP0057:STRING=NEW
  )
  
  set(ANDROID_NATIVE_DEPS "")
 diff --git a/client/Android/cmake/ExternalOpenSSL.cmake b/client/Android/cmake/ExternalOpenSSL.cmake
-index ec7fde4bd..6dda81759 100644
 --- a/client/Android/cmake/ExternalOpenSSL.cmake
 +++ b/client/Android/cmake/ExternalOpenSSL.cmake
-@@ -16,7 +16,14 @@ else()
+@@ -16,7 +16,14 @@
    message(FATAL_ERROR "ExternalOpenSSL: unsupported ABI '${ANDROID_ABI}'")
  endif()
  
@@ -55,24 +35,23 @@ index ec7fde4bd..6dda81759 100644
  
  ExternalProject_Add(
    openssl
-@@ -26,14 +33,15 @@ ExternalProject_Add(
-   URL https://github.com/openssl/openssl/releases/download/${OPENSSL_VERSION}/${OPENSSL_VERSION}.tar.gz
+@@ -27,13 +34,13 @@
    URL_HASH ${OPENSSL_HASH}
    LIST_SEPARATOR |
-+  PATCH_COMMAND py "${CMAKE_CURRENT_LIST_DIR}/patch_openssl.py" "<SOURCE_DIR>/Configurations/15-android.conf"
    CONFIGURE_COMMAND
 -    ${CMAKE_COMMAND} -E env PATH=${NDK_TOOLCHAIN_BIN}:$ENV{PATH} ANDROID_NDK=${NDK_ROOT} ANDROID_NDK_ROOT=${NDK_ROOT}
-+    ${CMAKE_COMMAND} -E env "PATH=${OSSL_ENV_PATH}" ANDROID_NDK=${NDK_ROOT_SLASH} ANDROID_NDK_ROOT=${NDK_ROOT_SLASH}
-     ANDROID_NDK_HOME=${NDK_ROOT_SLASH} CC=clang perl <SOURCE_DIR>/Configure ${OSSL_ARCH} shared no-tests no-apps no-docs
+-    ANDROID_NDK_HOME=${NDK_ROOT} CC=clang perl <SOURCE_DIR>/Configure ${OSSL_ARCH} shared no-tests no-apps no-docs
++    ${CMAKE_COMMAND} -E env "PATH=${OSSL_ENV_PATH}" "ANDROID_NDK=${NDK_ROOT_SLASH}" "ANDROID_NDK_ROOT=${NDK_ROOT_SLASH}"
++    "ANDROID_NDK_HOME=${NDK_ROOT_SLASH}" perl <SOURCE_DIR>/Configure ${OSSL_ARCH} shared no-tests no-apps no-docs
      -U__ANDROID_API__ -D__ANDROID_API__=${NDK_API_LEVEL} --prefix=${DEPS_INSTALL_DIR} --libdir=${CMAKE_INSTALL_LIBDIR}
 -  BUILD_COMMAND ${CMAKE_COMMAND} -E env PATH=${NDK_TOOLCHAIN_BIN}:$ENV{PATH} ANDROID_NDK=${NDK_ROOT}
-+  BUILD_COMMAND ${CMAKE_COMMAND} -E env "PATH=${OSSL_ENV_PATH}" ANDROID_NDK=${NDK_ROOT_SLASH}
-                 ANDROID_NDK_ROOT=${NDK_ROOT_SLASH} ANDROID_NDK_HOME=${NDK_ROOT_SLASH} make -j SHLIB_EXT=.so build_libs
+-                ANDROID_NDK_ROOT=${NDK_ROOT} ANDROID_NDK_HOME=${NDK_ROOT} make -j SHLIB_EXT=.so build_libs
++  BUILD_COMMAND ${CMAKE_COMMAND} -E env "PATH=${OSSL_ENV_PATH}" "ANDROID_NDK=${NDK_ROOT_SLASH}"
++                "ANDROID_NDK_ROOT=${NDK_ROOT_SLASH}" "ANDROID_NDK_HOME=${NDK_ROOT_SLASH}" make -j SHLIB_EXT=.so build_libs
    INSTALL_COMMAND
 -    ${CMAKE_COMMAND} -E env PATH=${NDK_TOOLCHAIN_BIN}:$ENV{PATH} ANDROID_NDK=${NDK_ROOT} ANDROID_NDK_ROOT=${NDK_ROOT}
-+    ${CMAKE_COMMAND} -E env "PATH=${OSSL_ENV_PATH}" ANDROID_NDK=${NDK_ROOT_SLASH} ANDROID_NDK_ROOT=${NDK_ROOT_SLASH}
-     ANDROID_NDK_HOME=${NDK_ROOT_SLASH} make -j SHLIB_EXT=.so install_sw && ${CMAKE_COMMAND} -E copy_directory
+-    ANDROID_NDK_HOME=${NDK_ROOT} make -j SHLIB_EXT=.so install_sw && ${CMAKE_COMMAND} -E copy_directory
++    ${CMAKE_COMMAND} -E env "PATH=${OSSL_ENV_PATH}" "ANDROID_NDK=${NDK_ROOT_SLASH}" "ANDROID_NDK_ROOT=${NDK_ROOT_SLASH}"
++    "ANDROID_NDK_HOME=${NDK_ROOT_SLASH}" make -j SHLIB_EXT=.so install_sw && ${CMAKE_COMMAND} -E copy_directory
      ${DEPS_INSTALL_DIR}/${CMAKE_INSTALL_LIBDIR}/ossl-modules ${DEPS_INSTALL_DIR}/${CMAKE_INSTALL_LIBDIR}
  )
--- 
-2.47.1

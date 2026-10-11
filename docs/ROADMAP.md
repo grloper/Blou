@@ -42,7 +42,7 @@ These are the previous backlog items; unchanged and still unticked unless stated
 - [ ] **R9 Fingerprint API** (SHA-256/SHA-1 prefixes, constant-time compare, reject other lengths).
 
 ### FreeRDP integration (fallback engine; needs `scripts/setup.sh --with-freerdp` and network)
-- [ ] **R10 Rebase `patches/0002-android-cmake-cross-compile-fixes.patch`** onto FreeRDP `63b948ca5`; add `scripts/check_patches.sh`.
+- [x] **R10 Rebase Android CMake patch** onto FreeRDP `63b948ca5cb94307fd5444ee6e73927a41ccdab4`; add non-mutating `scripts/check_patches.sh`. Both patches apply sequentially to exported pinned files. Five hermetic regression cases pass; no OpenSSL source edits or missing helper files. Patch application is proven, Android compilation remains UNVERIFIED. Evidence: `docs/verification/freerdp-patches.md`.
 - [ ] **R11 Parameterize `scripts/run_phase0_probe.sh`** (`--help`, require `HOST`, no default IP).
 - [ ] **R12 Document the manual Phase 0 procedure** in `docs/PHASE0.md` (superseded in part by the checklist in `docs/IRONRDP_FEASIBILITY.md`; reconcile).
 

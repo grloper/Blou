@@ -3,6 +3,10 @@
 Original verification date: 2026-10-01 (Windows). The suite was re-run on Linux for v0.1.0 via `scripts/verify.sh`.
 Documentation and pre-existing demo data were treated as untrusted leads. Claims below come from inspected implementation and local execution.
 
+## Rust-first follow-ups (2026-10-11)
+
+- [FreeRDP fallback patches](freerdp-patches.md): both pinned patches apply; Android compilation remains UNVERIFIED.
+
 ## Verified use case
 
 Validate fabricated monitor layouts, map a phone viewport to a composite desktop and encode RDP display-control messages in Python.

@@ -5,8 +5,8 @@ unmaintained = "all"
 unsound = "all"
 
 [licenses]
-# ISC: ring/untrusted; BSD-3-Clause: subtle. Other dependencies offer Apache-2.0.
-allow = ["Apache-2.0", "ISC", "BSD-3-Clause"]
+# ISC: ring/untrusted; BSD-3-Clause: subtle; MIT/Unicode-3.0: upstream PDU/parser macros.
+allow = ["Apache-2.0", "ISC", "BSD-3-Clause", "MIT", "Unicode-3.0"]
 confidence-threshold = 0.93
 
 [bans]

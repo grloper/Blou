@@ -51,7 +51,7 @@ def generate_vectors():
     synthetic = b"MIIB...SAMPLE_X509_CERTIFICATE_DER_BYTES...1234567890"
     fingerprint = CertificatePinningVerifier.compute_cert_fingerprint(synthetic)
     return {
-        "scope": "offline Python parity; synthetic security bytes; legacy DVC header is not session-ready",
+        "scope": "offline Python parity; synthetic security bytes; DVC cross-checked against pinned IronRDP",
         "layouts": layouts, "viewport": viewport, "swipes": swipes,
         "caps": list(DisplayControlEncoder.encode_caps_pdu(4, 1)),
         "pin": {"synthetic": list(synthetic), "sha256": fingerprint},

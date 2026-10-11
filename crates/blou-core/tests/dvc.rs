@@ -32,3 +32,50 @@ fn encode_3_monitor_layout_pdu() {
         );
     }
 }
+
+#[test]
+fn monitor_layout_size_and_unknown_physical_dimensions() {
+    for count in 1..=4 {
+        let pdu = dvc::encode_monitor_layout_pdu(
+            &LayoutBuilder::horizontal_row(count, 1920, 1080).unwrap(),
+        )
+        .unwrap();
+        assert_eq!(word(&pdu, 8), 40);
+        for i in 0..count {
+            let offset = 16 + i * 40;
+            assert_eq!((word(&pdu, offset + 20), word(&pdu, offset + 24)), (0, 0));
+            assert_eq!(
+                (
+                    word(&pdu, offset + 28),
+                    word(&pdu, offset + 32),
+                    word(&pdu, offset + 36)
+                ),
+                (0, 100, 100)
+            );
+        }
+    }
+}
+
+#[test]
+fn odd_widths_are_rejected_without_rounding() {
+    let layout = LayoutBuilder::horizontal_row(3, 1921, 1080).unwrap();
+    assert!(dvc::encode_monitor_layout_pdu(&layout).is_err());
+    assert_eq!(layout.monitors()[1].x, 1921);
+    assert_eq!(layout.monitors()[1].width, 1921);
+}
+
+#[test]
+fn display_control_rejects_out_of_product_or_protocol_range() {
+    for count in [5, 16] {
+        assert!(dvc::encode_monitor_layout_pdu(
+            &LayoutBuilder::horizontal_row(count, 1920, 1080).unwrap()
+        )
+        .is_err());
+    }
+    for (w, h) in [(199, 1080), (8194, 1080), (1920, 199), (1920, 8193)] {
+        assert!(
+            dvc::encode_monitor_layout_pdu(&LayoutBuilder::horizontal_row(1, w, h).unwrap())
+                .is_err()
+        );
+    }
+}

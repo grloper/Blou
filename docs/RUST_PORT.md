@@ -1,6 +1,6 @@
 # Rust port plan
 
-Status: all 27 portable Python cases have passing Rust counterparts and Python-generated golden vectors. Python in `src/blou/` remains the executable reference; retirement requires owner approval. Certificate fixture/TLS enforcement, upstream DVC correctness, RDP and Android integration remain pending. See `docs/ROADMAP.md` for the ordered tasks.
+Status: all 27 portable Python cases have passing Rust counterparts and Python-generated golden vectors. Python in `src/blou/` remains the executable reference; retirement requires owner approval. Always-on pinning is proven with certificate fixtures and in-memory TLS; upstream DVC correctness, RDP and Android integration remain pending. See `docs/ROADMAP.md` for the ordered tasks.
 
 Rust is pinned to 1.94.1 (including rustfmt and Clippy) in `rust-toolchain.toml`. Install rustup before `scripts/setup.sh`; setup fetches locked dependencies and the gate uses `--offline --locked`. The Python wheelhouse does not include Rust: offline setup also needs the pinned Rust toolchain and Cargo cache provisioned beforehand.
 
@@ -20,6 +20,10 @@ API references: [ring digest](https://docs.rs/ring/0.17.14/ring/digest/), [subtl
 `scripts/gen_vectors.py` generates `tests/vectors/portable-core.json`; Python tests require it to be reproducible and Rust compares complete output values. The DVC reference contains a known MonitorLayoutSize defect (0 instead of 40), also visible by reading the spike test. This port deliberately preserves exact reference bytes for the parity test, with explicit warnings in the API. N5 must correct and cross-check them before session integration. The security reference uses synthetic bytes rather than an X.509 certificate; these tests prove fingerprint policy, while N4 must prove fixture-certificate/TLS behaviour.
 
 ## Workspace layout (proposed)
+
+`blou-rdp::tls` now supplies a custom Rustls verifier and client config. The configured leaf SHA-256 pin is the identity/trust authority; CA or name validation cannot bypass it. This is pin-authorised trust rather than a combination of pinning and public-CA policy. Upstream Rustls parses the certificate and rustls/ring verifies TLS signatures. Resumption is disabled so each connection presents its certificate, and TLS key logging is disabled. No OS root store is needed by this config. Use it for the future RDP transport; the IronRDP failure-only callback does not enforce this policy for normally trusted certificates.
+
+Rustls is pinned to 0.23.45, a patched release for [RUSTSEC-2026-0285](https://rustsec.org/advisories/RUSTSEC-2026-0285.html). IronRDP TLS is an unmodified test dependency at `e4143f26306a6639a889d80c1c484ca69c365a8f` (with explicit Strict policy). The production adapter does not use IronRDP's default certificate policy or failure-only callback. Offline evidence: `docs/verification/rust-pinning.md`. Live RDP and Android remain UNVERIFIED.
 
 ```
 Cargo.toml                 # [workspace] resolver = "2", shared lints (clippy -D warnings), edition 2021

@@ -22,6 +22,12 @@ Spike code: branch `spike/ironrdp-multimon`, `spike/ironrdp-multimon/` (not merg
 
 ## Spike results (offline)
 
+### N4 follow-up: strict pinning proven offline
+
+`blou-rdp::tls` uses an always-on Rustls verifier because the upstream callback only executes on validation failure. Source at the same pinned commit confirms this control flow; the self-signed Strict callback control passes in tests. Nine fixture tests prove matching pins, missing/mismatching pins (all 256 single-bit SHA-256 mutations), malformed matching bytes, a leaf that actually validates against an isolated trusted CA, and in-memory TLS 1.2/1.3 handshake match/mismatch controls. CA trust cannot bypass the custom verifier's pin check. Evidence: `docs/verification/rust-pinning.md`.
+
+The configured pin is the trust authority. Rustls parses X.509 and rustls/ring verifies handshake signatures; no custom cryptography, OS trust-store changes, TOFU or user override. The config disables resumption and TLS key logging. Transport integration still must use this exact config; real RDP/Android enforcement remains UNVERIFIED. Rustls 0.23.41 from the upstream lockfile failed the advisory check for RUSTSEC-2026-0285; Blou pins the patched 0.23.45 instead. IronRDP itself remains unmodified.
+
 Spike crate: `spike/ironrdp-multimon` on branch `spike/ironrdp-multimon`, pinned to the git rev above (a crates.io pin is impossible for finding #4).
 
 `cargo test`: **6 passed, 0 failed**; `cargo clippy --all-targets -- -D warnings` clean; `cargo fmt` applied.

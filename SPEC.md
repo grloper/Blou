@@ -97,3 +97,8 @@ Status: Rust-first architecture adopted by the owner. IronRDP is the preferred e
 - G2: 27 portable Python test cases pass as Rust tests with golden-vector parity.
 
 **Fallback.** If G0 (IronRDP) or G1 fails, keep FreeRDP as the engine behind the same `blou-core`; the Rust core and Kotlin UI are still valid (hybrid). The Rust/Kotlin split does not depend on the engine choice.
+
+**Owner priority update (2026-10-11).** Prioritize FreeRDP fallback implementation
+while the pinned IronRDP connector fails dependency policy (see
+`docs/verification/rdp-config.md`). IronRDP remains a gated candidate; this does
+not change the Rust core, thin Kotlin UI, mandatory pinning, or hardware gates.

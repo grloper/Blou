@@ -11,6 +11,7 @@ Documentation and pre-existing demo data were treated as untrusted leads. Claims
 - [Display control](display-control.md): corrected bytes, upstream cross-check and odd-width rejection.
 - [Connector prototype](rdp-config.md): all six spike cases re-run; **adoption blocked** by dependency scan. Current full gate: 41 Python + 55 Rust tests, baseline 96, exit 0. Security scans fail separately; no hardware/Android success is implied.
 - [Human gate checklists](../HARDWARE_GATES.md): Windows/phone checks remain UNVERIFIED.
+- [FreeRDP fallback patches](freerdp-patches.md): both pinned patches apply; Android compilation remains UNVERIFIED.
 
 ## Verified use case
 

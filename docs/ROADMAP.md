@@ -2,6 +2,10 @@
 
 Direction (DR-001 in `SPEC.md`): Rust-first product. Rust core + thin Android UI, IronRDP preferred engine, FreeRDP fallback. Python in `src/blou/` is the reference until Rust parity.
 
+Owner priority update (2026-10-11): prioritize FreeRDP fallback work while IronRDP
+connector adoption is blocked by dependency policy. Work through R10–R12 before
+resuming the Android toolchain proof; Rust core/Kotlin direction is unchanged.
+
 Rules: do tasks top to bottom; each has a runnable acceptance check. Finish with `scripts/verify.sh` green and read all of its output. No CI (billing blocked): merge with `[skip ci]`; never force-push `main`. Tick the box + CHANGELOG line when done. `[human]` = needs a person/hardware; an agent must stop and report, not simulate.
 
 ## P0: Rust-first foundation
@@ -42,7 +46,7 @@ These are the previous backlog items; unchanged and still unticked unless stated
 - [ ] **R9 Fingerprint API** (SHA-256/SHA-1 prefixes, constant-time compare, reject other lengths).
 
 ### FreeRDP integration (fallback engine; needs `scripts/setup.sh --with-freerdp` and network)
-- [ ] **R10 Rebase `patches/0002-android-cmake-cross-compile-fixes.patch`** onto FreeRDP `63b948ca5`; add `scripts/check_patches.sh`.
+- [x] **R10 Rebase Android CMake patch** onto FreeRDP `63b948ca5cb94307fd5444ee6e73927a41ccdab4`; add non-mutating `scripts/check_patches.sh`. Both patches apply sequentially to exported pinned files. Five hermetic regression cases pass; no OpenSSL source edits or missing helper files. Patch application is proven, Android compilation remains UNVERIFIED. Evidence: `docs/verification/freerdp-patches.md`.
 - [ ] **R11 Parameterize `scripts/run_phase0_probe.sh`** (`--help`, require `HOST`, no default IP).
 - [ ] **R12 Document the manual Phase 0 procedure** in `docs/PHASE0.md` (superseded in part by the checklist in `docs/IRONRDP_FEASIBILITY.md`; reconcile).
 

@@ -60,5 +60,29 @@ class TestDisplayControlEncoder(unittest.TestCase):
         self.assertEqual((m2_w, m2_h), (1920, 1080))
 
 
+class TestDisplayControlProtocolRegression(unittest.TestCase):
+    def test_layout_entry_size_and_unknown_physical_dimensions(self):
+        for count in range(1, 5):
+            pdu = DisplayControlEncoder.encode_monitor_layout_pdu(LayoutBuilder.create_horizontal_row(count=count))
+            self.assertEqual(struct.unpack_from("<I", pdu, 8)[0], 40)
+            for i in range(count):
+                self.assertEqual(struct.unpack_from("<IIIII", pdu, 16 + i * 40 + 20), (0, 0, 0, 100, 100))
+
+    def test_odd_width_is_rejected_without_rounding(self):
+        layout = LayoutBuilder.create_horizontal_row(count=3, monitor_width=1921)
+        with self.assertRaises(ValueError):
+            DisplayControlEncoder.encode_monitor_layout_pdu(layout)
+        self.assertEqual(layout.get_monitor(1).x, 1921)
+        self.assertEqual(layout.get_monitor(1).width, 1921)
+
+    def test_reject_out_of_product_or_protocol_range(self):
+        for count in (5, 16):
+            with self.assertRaises(ValueError):
+                DisplayControlEncoder.encode_monitor_layout_pdu(LayoutBuilder.create_horizontal_row(count=count))
+        for w, h in ((199, 1080), (8194, 1080), (1920, 199), (1920, 8193)):
+            with self.assertRaises(ValueError):
+                DisplayControlEncoder.encode_monitor_layout_pdu(LayoutBuilder.create_horizontal_row(count=1, monitor_width=w, monitor_height=h))
+
+
 if __name__ == "__main__":
     unittest.main()

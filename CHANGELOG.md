@@ -5,6 +5,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Version
 ## [Unreleased]
 
 ### Added
+- Ported all 27 portable Python cases to Rust before implementation; added validated geometry, viewport transforms/swipes, SHA-256 fingerprint policy using ring/subtle, and offline DVC-reference serialization. Added Python-generated golden vectors and reproducibility checks; all original Python tests remain active. The legacy DVC header defect is documented and pending N5 correction before session use.
 - Rust workspace scaffolding with `blou-core`, Rust 1.94.1, committed lockfile and shared lints (unsafe code forbidden). The verification gate now requires offline, locked Rust lint and tests; Python tests remain active.
 - Dependency policies in `deny.toml` and `.cargo/audit.toml`, with no advisory exceptions; workspace metadata test guards the core/engine boundary.
 - Docs: Rust-first decision record DR-001 (`SPEC.md`), IronRDP feasibility findings (`docs/IRONRDP_FEASIBILITY.md`), Rust port plan (`docs/RUST_PORT.md`), reprioritized `docs/ROADMAP.md`, Rust commands in `AGENTS.md`.

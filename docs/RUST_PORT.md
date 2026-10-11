@@ -1,6 +1,6 @@
 # Rust port plan
 
-Status: workspace scaffolding implemented; the core modules have no behaviour yet. Python in `src/blou/` stays the executable reference until Rust passes the same cases (parity). See `docs/ROADMAP.md` for the ordered tasks.
+Status: all 27 portable Python cases have passing Rust counterparts and Python-generated golden vectors. Python in `src/blou/` remains the executable reference; retirement requires owner approval. Certificate fixture/TLS enforcement, upstream DVC correctness, RDP and Android integration remain pending. See `docs/ROADMAP.md` for the ordered tasks.
 
 Rust is pinned to 1.94.1 (including rustfmt and Clippy) in `rust-toolchain.toml`. Install rustup before `scripts/setup.sh`; setup fetches locked dependencies and the gate uses `--offline --locked`. The Python wheelhouse does not include Rust: offline setup also needs the pinned Rust toolchain and Cargo cache provisioned beforehand.
 
@@ -13,7 +13,11 @@ cargo deny check
 cargo audit
 ```
 
-Both tools are development utilities, not runtime dependencies. Dependency additions must justify their license/source allowances; there are no ignored advisories. The skeleton has no external Rust dependencies. Security scans need a current advisory database and registry access; the local verification gate remains offline after setup.
+Both tools are development utilities, not runtime dependencies. Dependency additions must justify their license/source allowances; there are no ignored advisories. The port uses exactly pinned `ring` 0.17.14 for SHA-256, `subtle` 2.6.1 for constant-time comparison and test-only `serde_json` 1.0.145 for the golden oracle. `Cargo.lock` pins transitive resolution. Security scans need a current advisory database and registry access; the local verification gate remains offline after setup.
+
+API references: [ring digest](https://docs.rs/ring/0.17.14/ring/digest/), [subtle ConstantTimeEq](https://docs.rs/subtle/2.6.1/subtle/trait.ConstantTimeEq.html), [serde_json](https://docs.rs/serde_json/1.0.145/serde_json/). Local dependency review: none of these upstream repositories are archived; ring's last push was 2026-07-23, serde_json's 2026-10-11, subtle's 2024-08-03. Subtle has low recent activity; cargo-audit reported no advisories for this resolution, which does not constitute a code audit. Cargo-deny license policy adds only ISC (ring/untrusted) and BSD-3-Clause (subtle), based on downloaded manifests.
+
+`scripts/gen_vectors.py` generates `tests/vectors/portable-core.json`; Python tests require it to be reproducible and Rust compares complete output values. The DVC reference contains a known MonitorLayoutSize defect (0 instead of 40), also visible by reading the spike test. This port deliberately preserves exact reference bytes for the parity test, with explicit warnings in the API. N5 must correct and cross-check them before session integration. The security reference uses synthetic bytes rather than an X.509 certificate; these tests prove fingerprint policy, while N4 must prove fixture-certificate/TLS behaviour.
 
 ## Workspace layout (proposed)
 

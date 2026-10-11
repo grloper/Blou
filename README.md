@@ -4,7 +4,7 @@ Blou is a pre-alpha Python project exploring **virtual multi-monitor support for
 
 **Status: early prototype.** What exists and is tested is a pure-Python protocol/geometry core and a Windows-only local desktop-capture workbench. There is **no working Android/RDP client** in this repository. The FreeRDP integration is a design plus two patches (see [Limits](#limits)).
 
-The Rust-first workspace now contains `blou-core` scaffolding. Rust behaviour and parity are still pending; Python remains the executable reference. IronRDP is the preferred future engine, with FreeRDP retained as fallback. See [the Rust port plan](docs/RUST_PORT.md).
+The Rust-first workspace now implements `blou-core` geometry, viewport/swipe mapping and fingerprint-policy parity: all 27 portable reference cases have Rust counterparts and golden vectors. Python remains the executable reference. The DVC port preserves a known Python header defect for parity and must be corrected before session use. X.509/TLS enforcement and RDP integration remain pending. IronRDP is the preferred future engine, with FreeRDP retained as fallback. See [the Rust port plan](docs/RUST_PORT.md).
 
 ![Blou overview](docs/assets/overview.svg)
 

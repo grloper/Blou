@@ -67,7 +67,7 @@ After `scripts/setup.sh`, `verify.sh` and all tests need no network. Tests only 
 - Android/Windows steps marked `[human]` in `docs/ROADMAP.md` cannot be completed by an agent; stop and report.
 
 ## Style
-Python 3.10+ compatible syntax (no 3.11+-only features in `src/`). Rust: `rustfmt` defaults, edition 2021, workspace lints. Standard library only in the protocol core (`layout`, `viewport`, `dvc`, `security`). Keep commits small; subjects imperative, ending in `[skip ci]`.
+Python 3.10+ compatible syntax (no 3.11+-only features in `src/`). Rust: `rustfmt` defaults, edition 2021, workspace lints. Geometry/viewport/reference serialization use the standard library; certificate hashing/comparison must use pinned cryptographic libraries (ring/subtle), per the owner's direction. Keep commits small; subjects imperative, ending in `[skip ci]`.
 
 ## Codex notes
 Codex reads this file automatically. Suggested environment config: setup script `scripts/setup.sh`; check command `scripts/verify.sh`; internet may be disabled after setup. Work from `docs/ROADMAP.md`, one task per PR/branch.

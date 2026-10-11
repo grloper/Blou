@@ -9,3 +9,10 @@ description = "Portable layout, viewport, certificate pinning and display-contro
 
 [lints]
 workspace = true
+
+[dependencies]
+ring = "=0.17.14"
+subtle = "=2.6.1"
+
+[dev-dependencies]
+serde_json = "=1.0.145"

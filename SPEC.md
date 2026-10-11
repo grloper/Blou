@@ -68,9 +68,9 @@ In RDP, the client monitor layout is declared by the client and not verified by 
 
 ## 5. Decision Records
 
-### DR-001: Rust-first architecture, IronRDP as the preferred engine (PROPOSED, 2026-10-11)
+### DR-001: Rust-first architecture, IronRDP as the preferred engine (DIRECTION ADOPTED; ENGINE GATED, 2026-10-11)
 
-Status: proposed by the owner's direction; **not accepted until the gates below pass.** Evidence: `docs/IRONRDP_FEASIBILITY.md`. Port plan: `docs/RUST_PORT.md`. Order of work: `docs/ROADMAP.md`.
+Status: Rust-first architecture adopted by the owner. IronRDP is the preferred engine; replacing the FreeRDP fallback remains conditional on the gates below. Evidence: `docs/IRONRDP_FEASIBILITY.md`. Port plan: `docs/RUST_PORT.md`. Order of work: `docs/ROADMAP.md`.
 
 **Decision.** Blou's product logic moves to a Rust core (`blou-core`: layout geometry, touch-to-framebuffer mapping, certificate pinning/verification, display-control messages; `blou-rdp`: engine adapter; `blou-android`: bridge) with a thin Android UI (Kotlin). IronRDP (MIT OR Apache-2.0, Devolutions) becomes the preferred RDP engine, replacing FreeRDP, *if and only if* it passes the gates. FreeRDP stays as the fallback and as the Phase 0 baseline until then.
 

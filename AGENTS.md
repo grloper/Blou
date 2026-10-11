@@ -5,7 +5,7 @@ Instructions for AI coding agents (OpenAI Codex cloud/CLI, and any other) and hu
 ## What this project is
 Blou: pre-alpha Python library exploring virtual multi-monitor display geometry for a phone-sized RDP client, plus a Windows-only local desktop workbench. No Android/RDP client exists yet. Do not write docs or code comments that claim otherwise.
 
-Direction (DR-001 in `SPEC.md`, proposed): Rust-first. Rust core + thin Android UI, IronRDP as preferred RDP engine, FreeRDP kept as fallback until gates pass. The Python package is the executable reference until Rust parity. Read `docs/IRONRDP_FEASIBILITY.md` (evidence, UNVERIFIED items) and `docs/RUST_PORT.md` (layout, test mapping) first. The Phase 0 gate (Windows accepts a fabricated multi-monitor layout) is still UNVERIFIED; never claim it.
+Direction (DR-001 in `SPEC.md`, adopted by the owner): Rust-first. Rust core + thin Android UI, IronRDP as preferred RDP engine, FreeRDP kept as fallback until gates pass. The Python package remains the reference; portable Rust test parity is proven, retirement not yet performed. Read `docs/IRONRDP_FEASIBILITY.md` (evidence, UNVERIFIED items) and `docs/RUST_PORT.md` (layout, test mapping) first. The Phase 0 gate (Windows accepts a fabricated multi-monitor layout) is still UNVERIFIED; never claim it.
 
 ## Setup (once per clean sandbox)
 ```

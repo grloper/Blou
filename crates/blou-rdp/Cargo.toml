@@ -1,0 +1,19 @@
+[package]
+name = "blou-rdp"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+description = "Pinned upstream RDP/TLS adapters for Blou"
+
+[lints]
+workspace = true
+
+[dependencies]
+blou-core = { path = "../blou-core", version = "=0.1.0" }
+rustls = { version = "=0.23.45", default-features = false, features = ["std", "ring", "tls12"] }
+
+[dev-dependencies]
+ring = "=0.17.14"
+ironrdp-tls = { version = "=0.2.2", git = "https://github.com/Devolutions/IronRDP", rev = "e4143f26306a6639a889d80c1c484ca69c365a8f", default-features = false, features = ["rustls-ring"] }

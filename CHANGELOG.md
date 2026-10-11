@@ -5,6 +5,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Version
 ## [Unreleased]
 
 ### Added
+- Always-on Rustls certificate pin verifier and client config in `blou-rdp`: no TOFU/override, no resumption or key logging, upstream X.509 parsing and TLS signatures. Added synthetic certificate fixtures, 256 single-bit mismatch controls, trusted-root rejection and in-memory TLS 1.2/1.3 tests. Rustls pinned to patched 0.23.45 after the advisory scan rejected 0.23.41.
 - Ported all 27 portable Python cases to Rust before implementation; added validated geometry, viewport transforms/swipes, SHA-256 fingerprint policy using ring/subtle, and offline DVC-reference serialization. Added Python-generated golden vectors and reproducibility checks; all original Python tests remain active. The legacy DVC header defect is documented and pending N5 correction before session use.
 - Rust workspace scaffolding with `blou-core`, Rust 1.94.1, committed lockfile and shared lints (unsafe code forbidden). The verification gate now requires offline, locked Rust lint and tests; Python tests remain active.
 - Dependency policies in `deny.toml` and `.cargo/audit.toml`, with no advisory exceptions; workspace metadata test guards the core/engine boundary.

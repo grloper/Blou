@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/blou-core"]
+members = ["crates/blou-core", "crates/blou-rdp"]
 resolver = "2"
 
 [workspace.package]

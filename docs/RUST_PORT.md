@@ -1,6 +1,19 @@
 # Rust port plan
 
-Status: proposal. Python in `src/blou/` stays the executable reference until Rust passes the same cases (parity). No Rust code exists on `main` yet; see `docs/ROADMAP.md` for the ordered tasks.
+Status: workspace scaffolding implemented; the core modules have no behaviour yet. Python in `src/blou/` stays the executable reference until Rust passes the same cases (parity). See `docs/ROADMAP.md` for the ordered tasks.
+
+Rust is pinned to 1.94.1 (including rustfmt and Clippy) in `rust-toolchain.toml`. Install rustup before `scripts/setup.sh`; setup fetches locked dependencies and the gate uses `--offline --locked`. The Python wheelhouse does not include Rust: offline setup also needs the pinned Rust toolchain and Cargo cache provisioned beforehand.
+
+Supply-chain configuration follows the [cargo-deny configuration](https://embarkstudios.github.io/cargo-deny/checks/cfg.html) and [cargo-audit example](https://github.com/rustsec/rustsec/blob/main/cargo-audit/audit.toml.example). Optional online review commands (not hermetic tests):
+
+```bash
+cargo install cargo-deny --version 0.20.2 --locked
+cargo install cargo-audit --version 0.22.2 --locked
+cargo deny check
+cargo audit
+```
+
+Both tools are development utilities, not runtime dependencies. Dependency additions must justify their license/source allowances; there are no ignored advisories. The skeleton has no external Rust dependencies. Security scans need a current advisory database and registry access; the local verification gate remains offline after setup.
 
 ## Workspace layout (proposed)
 

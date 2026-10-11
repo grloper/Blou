@@ -12,6 +12,7 @@ VENV="${VENV:-.venv}"
 step() { printf '\n== %s\n' "$*"; }
 warn_step() { local n="$1"; shift; step "$n (non-blocking)"; if ! "$@"; then echo "WARN: '$n' failed (non-blocking)"; fi; }
 command -v git >/dev/null 2>&1 || { echo "verify: git not found" >&2; exit 2; }
+command -v cargo >/dev/null 2>&1 || { echo "verify: cargo not found; install the pinned Rust toolchain" >&2; exit 2; }
 
 step "shell syntax"
 for f in scripts/*.sh; do bash -n "$f"; done
@@ -54,14 +55,14 @@ assert "blou/layout.py" in names, names
 print("wheel contains blou package:", whl[0].rsplit("/", 1)[-1])
 PY
 
-step "rust (fmt, clippy -D warnings, test) - only if a root Cargo.toml exists and cargo is installed"
-if [[ -f Cargo.toml ]] && command -v cargo >/dev/null 2>&1; then
-  cargo fmt --all -- --check
-  cargo clippy --workspace --all-targets -- -D warnings
-  cargo test --workspace
-else
-  echo "SKIP: no root Cargo.toml (Rust workspace not created yet) or cargo not installed"
-fi
+step "rust fmt"
+cargo fmt --all -- --check
 
-printf '\nPASS: shell syntax + actionlint + ruff + unittest + test-integrity + offline demo + package build (+ rust fmt/clippy/test when a root Cargo.toml exists).\n'
+step "rust clippy (-D warnings, locked, offline)"
+cargo clippy --workspace --all-targets --locked --offline -- -D warnings
+
+step "rust tests (locked, offline)"
+cargo test --workspace --locked --offline
+
+printf '\nPASS: shell syntax + actionlint + ruff + unittest + test-integrity + offline demo + package build + rust fmt/clippy/test.\n'
 printf 'NOT CHECKED: Windows/Android builds, FreeRDP native submodule, real remote sessions, Windows screen capture.\n'

@@ -1,0 +1,14 @@
+[advisories]
+ignore = []
+informational_warnings = ["unmaintained", "unsound", "yanked"]
+
+[database]
+url = "https://github.com/RustSec/advisory-db.git"
+fetch = true
+stale = false
+
+[output]
+deny = ["unmaintained", "unsound", "yanked"]
+format = "terminal"
+quiet = false
+show_tree = true

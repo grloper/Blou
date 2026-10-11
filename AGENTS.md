@@ -28,10 +28,10 @@ Cloud-sandbox tip: put `scripts/setup.sh` in the environment's setup script; run
 | Offline demo | `.venv/bin/python scripts/demo_local.py` |
 | Rust format (once root `Cargo.toml` exists) | `cargo fmt --all -- --check` |
 | Rust lint | `cargo clippy --workspace --all-targets -- -D warnings` |
-| Rust tests | `cargo test --workspace` |
+| Rust tests | `cargo test --workspace --locked --offline` |
 | Rust Android target check (needs `rustup target add aarch64-linux-android`) | `cargo check --workspace --target aarch64-linux-android` |
 
-`scripts/verify.sh` runs: shell syntax, actionlint, ruff, mypy (warn only), unittest, test-integrity, demo fixture unchanged, package build, then Rust fmt/clippy/test only if a root `Cargo.toml` and `cargo` exist (otherwise prints SKIP). Exit 0 = pass. Read the whole output; do not infer success from partial output.
+`scripts/verify.sh` runs: shell syntax, actionlint, ruff, mypy (warn only), unittest, test-integrity, demo fixture unchanged, package build, then mandatory Rust fmt/clippy/test (`--locked --offline` for lint/tests). Missing cargo fails the gate. Exit 0 = pass. Read the whole output; do not infer success from partial output.
 
 ## Repo map
 - `src/blou/` library: `layout.py` (monitor layouts), `viewport.py` (touch<->desktop mapping, swipe), `dvc.py` (display-control PDU encoding), `security.py` (fingerprint pinning), `desktop.py` (Windows workbench; needs Pillow, uses Windows APIs at runtime).

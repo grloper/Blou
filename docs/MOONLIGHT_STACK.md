@@ -85,7 +85,9 @@ Verified from documentation and source:
 
 ## 9. Measurements: TO-MEASURE (owner's PC; do not fill with estimates)
 
-Every row stays `TO-MEASURE` until an agent with access to the owner's PC records real numbers with date, versions and commit hashes. No fabricated or typical values.
+Every row stays `TO-MEASURE` until an agent with access to the owner's PC records real numbers with date, versions and commit hashes. Partial observations must retain **UNVERIFIED** for the remaining checks. No fabricated or typical values.
+
+2026-10-12: host preflight and an active Sunshine session were observed; the owner reported the phone connected. This does not pass H0. Phone overlay values, input behaviour and the remaining measurements are pending. See [the redacted evidence and phone worksheet](verification/streaming-hardware.md). S1 remains unchecked.
 
 Preconditions (human/agent with PC access):
 1. Record host: Windows edition/build, GPU + driver, monitor count/resolutions/refresh, Sunshine version, Tailscale versions on PC and phone, phone model/Android version, Moonlight Android version.

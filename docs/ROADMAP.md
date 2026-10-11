@@ -43,7 +43,7 @@ These are the previous backlog items; unchanged and still unticked unless stated
 
 ### FreeRDP integration (fallback engine; needs `scripts/setup.sh --with-freerdp` and network)
 - [x] **R10 Rebase Android CMake patch** onto FreeRDP `63b948ca5cb94307fd5444ee6e73927a41ccdab4`; add non-mutating `scripts/check_patches.sh`. Both patches apply sequentially to exported pinned files. Five hermetic regression cases pass; no OpenSSL source edits or missing helper files. Patch application is proven, Android compilation remains UNVERIFIED. Evidence: `docs/verification/freerdp-patches.md`.
-- [ ] **R11 Parameterize `scripts/run_phase0_probe.sh`** (`--help`, require `HOST`, no default IP).
+- [ ] **R11 Phase 0 probe — PARAMETERIZED, LIVE BLOCKED**: offline `--help`/`--prepare` require HOST, USERNAME, CERT_SHA256 and executable, with no identity/pin logging. Six regression tests prove no client launch. Removed certificate-ignore/clipboard launch; live invocation rejects until always-on native pin integration is proven, including a trusted-root mismatch. FreeRDP's CLI allowlist falls through to CA/name acceptance on a mismatch. Evidence: `docs/verification/freerdp-probe-policy.md`. Next offline task: callback adapter with `ExternalCertificateManagement`, empty built-in allowlist, upstream certificate parsing and Rust ring/subtle policy; do not mark R11 complete before secure launch exists.
 - [ ] **R12 Document the manual Phase 0 procedure** in `docs/PHASE0.md` (superseded in part by the checklist in `docs/IRONRDP_FEASIBILITY.md`; reconcile).
 
 ### Packaging and project

@@ -25,6 +25,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 command -v "$PYTHON" >/dev/null 2>&1 || { echo "setup: '$PYTHON' not found" >&2; exit 2; }
+command -v cargo >/dev/null 2>&1 || { echo "setup: cargo not found; install Rust with rustup first" >&2; exit 2; }
 "$PYTHON" -c 'import sys; sys.exit(0 if sys.version_info >= (3, 10) else 1)' \
   || { echo "setup: Python >= 3.10 required, found $("$PYTHON" --version 2>&1)" >&2; exit 2; }
 "$PYTHON" -c 'import venv, ensurepip' 2>/dev/null \
@@ -58,6 +59,12 @@ fi
 if (( WITH_FREERDP )); then
   # The gitlink points at upstream FreeRDP 3.31.1 (63b948ca5). Not needed for the Python gate.
   git submodule update --init --depth 1 FreeRDP
+fi
+
+if [[ -n "$WHEELHOUSE" ]]; then
+  cargo fetch --locked --offline
+else
+  cargo fetch --locked
 fi
 
 "$PY" -c 'import blou; print("setup: blou importable from", blou.__file__)'

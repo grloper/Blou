@@ -4,6 +4,8 @@ Blou is a pre-alpha Python project exploring **virtual multi-monitor support for
 
 **Status: early prototype.** What exists and is tested is a pure-Python protocol/geometry core and a Windows-only local desktop-capture workbench. There is **no working Android/RDP client** in this repository. The FreeRDP integration is a design plus two patches (see [Limits](#limits)).
 
+The Rust-first workspace now contains `blou-core` scaffolding. Rust behaviour and parity are still pending; Python remains the executable reference. IronRDP is the preferred future engine, with FreeRDP retained as fallback. See [the Rust port plan](docs/RUST_PORT.md).
+
 ![Blou overview](docs/assets/overview.svg)
 
 ## What is in the box
@@ -21,13 +23,13 @@ The protocol core uses only the Python standard library.
 
 ## Quick start
 
-Requires Python 3.10+ (developed and verified on 3.13), `git`, and network access once for setup.
+Requires Python 3.10+ (this workspace gate also verified on 3.12), `git`, Rust via rustup (pinned to 1.94.1), and network access once for setup.
 
 ```bash
 git clone https://github.com/grloper/Blou.git
 cd Blou
 scripts/setup.sh        # creates .venv, installs the project and pinned dev tools
-scripts/verify.sh       # the single gate: lint, 36 tests, offline demo, package build
+scripts/verify.sh       # the single gate: Python checks, offline demo, package build, Rust fmt/clippy/tests
 ```
 
 Run just the tests:

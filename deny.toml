@@ -1,0 +1,18 @@
+# Reviewed dependency sources, licenses and advisories; no exceptions at bootstrap.
+[advisories]
+ignore = []
+unmaintained = "all"
+unsound = "all"
+
+[licenses]
+allow = ["Apache-2.0"]
+confidence-threshold = 0.93
+
+[bans]
+multiple-versions = "deny"
+wildcards = "deny"
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+required-git-spec = "rev"

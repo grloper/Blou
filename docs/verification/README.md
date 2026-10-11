@@ -12,6 +12,7 @@ Documentation and pre-existing demo data were treated as untrusted leads. Claims
 - [Connector prototype](rdp-config.md): all six spike cases re-run; **adoption blocked** by dependency scan. Current full gate: 41 Python + 55 Rust tests, baseline 96, exit 0. Security scans fail separately; no hardware/Android success is implied.
 - [Human gate checklists](../HARDWARE_GATES.md): Windows/phone checks remain UNVERIFIED.
 - [FreeRDP fallback patches](freerdp-patches.md): both pinned patches apply; Android compilation remains UNVERIFIED.
+- [FreeRDP probe policy](freerdp-probe-policy.md): offline runner regression tests; live launch blocked by missing native strict pin integration.
 
 ## Verified use case
 

@@ -33,26 +33,9 @@ git -C FreeRDP apply --check ../patches/0001-xfreerdp-fabricated-multimon-layout
 
 The required upstream commit is `63b948ca5cb94307fd5444ee6e73927a41ccdab4`. If the check passes, apply the patch, inspect `git -C FreeRDP diff` in full, build the X11 client for that source and record exact build commands/version. This checklist does not claim a native build occurred here.
 
-2. Set `FREERDP_BIN` to that built executable. Confirm its `/help` supports `/sec:nla`, `/multimon:force`, `-clipboard`, and `/cert:deny,fingerprint:<hash>:<hex>`. These option shapes were checked from a local client's help; that does not establish the client's source provenance or host behaviour. **Do not use the existing `run_phase0_probe.sh` as-is: it contains `/cert:ignore`.**
-3. Before real credentials, test a deliberately wrong fingerprint with placeholder credentials only. Require an explicit certificate-rejection result; an authentication failure, password prompt or generic connection error does not prove pin rejection. The fingerprint CLI's behaviour for a CA-trusted mismatch is UNVERIFIED here. If it does not reject, stop and mark the security precondition blocked.
-
-```bash
-# RDP_HOST is supplied outside Git; 100.64.0.10 is only a placeholder.
-: "${RDP_HOST:?}" "${FREERDP_BIN:?}"
-BLOU_FAKE_MONITORS=1 "$FREERDP_BIN" \
-  /v:"$RDP_HOST" /u:USERNAME /p:NOT_A_REAL_PASSWORD \
-  /sec:nla /multimon:force -clipboard \
-  /cert:deny,fingerprint:sha256:0000000000000000000000000000000000000000000000000000000000000000
-```
-
-4. After that precondition passes, use the independently verified pin and the account supplied outside Git. Enter the password through the client's protected authentication flow, never as a command-line argument or committed log. Require pin match and NLA; stop on any certificate prompt/override path.
-
-```bash
-: "${RDP_HOST:?}" "${RDP_USER:?}" "${RDP_SHA256:?}" "${FREERDP_BIN:?}"
-BLOU_FAKE_MONITORS=1 "$FREERDP_BIN" \
-  /v:"$RDP_HOST" /u:"$RDP_USER" /sec:nla /multimon:force -clipboard \
-  /cert:deny,fingerprint:sha256:"$RDP_SHA256"
-```
+2. **Current security block: do not start a host session with the CLI fingerprint allowlist.** At the exact pinned revision, `libfreerdp/crypto/tls.c` accepts a matching allowlisted fingerprint early, then falls through to normal CA/name validation on a mismatch. `/cert:deny` controls failed-validation handling; it does not reject a CA/name-valid mismatching leaf. This is source evidence, not a native handshake test. See `verification/freerdp-probe-policy.md`.
+3. Run `bash scripts/run_phase0_probe.sh --help` for required inputs. Supply `HOST`, `USERNAME`, `CERT_SHA256` and `FREERDP_BIN` outside Git, then use `--prepare` for offline configuration validation. It prints no identity/pin and never launches the executable. Live invocation exits 3 until strict native pinning is integrated. There is currently no approved host-connect command.
+4. Before enabling a live probe, integrate `ExternalCertificateManagement` and `VerifyX509Certificate` with the immutable Rust pin policy, leaving the built-in fingerprint allowlist empty so it cannot bypass the callback. Upstream parses certificates; Rust ring/subtle hashes and compares. Prove missing/wrong pins reject for both self-signed and actually trusted-root fixtures, matching pins succeed, and no interactive override or TLS-only fallback occurs. Then publish the exact reviewed command and run the wrong-pin negative control before real credentials. Credentials must use a protected flow, never command-line arguments/logs.
 
 5. **Inside that exact RDP session**, open PowerShell and run:
 

@@ -61,8 +61,9 @@ also says only Linux was tested; Windows shell/build support remains UNVERIFIED.
 
 UNVERIFIED: Android NDK build/link, Windows command execution, release signature,
 FreeRDP native pin enforcement, NLA, real Windows display creation, phone runs.
-The existing probe still uses `/cert:ignore`; do not run it against a host.
-R11 must repair that runner before the human checklist can use it.
+At this R10 checkpoint the probe still used `/cert:ignore`. The subsequent
+[R11 preparation change](freerdp-probe-policy.md) removes that launch; native
+strict pin integration is still required before the human checklist can connect.
 These changes neither resolve nor waive the IronRDP advisories or cargo-deny
 duplicate-version failures recorded in `rdp-config.md`.
 

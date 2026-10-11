@@ -1,0 +1,16 @@
+[package]
+name = "blou-ironrdp-spike"
+version = "0.0.0"
+edition = "2021"
+publish = false
+description = "Spike: can IronRDP declare a client-fabricated 3x1920x1080 monitor layout? Not for release."
+
+# Config::monitor_layout landed on IronRDP master (PR #1675, 2026-08-16) AFTER the
+# ironrdp-connector 0.10.0 crates.io release (2026-07-10), so the spike must pin a git rev.
+[dependencies]
+ironrdp-connector = { git = "https://github.com/Devolutions/IronRDP", rev = "e4143f26306a6639a889d80c1c484ca69c365a8f" }
+ironrdp-pdu = { git = "https://github.com/Devolutions/IronRDP", rev = "e4143f26306a6639a889d80c1c484ca69c365a8f" }
+ironrdp-core = { git = "https://github.com/Devolutions/IronRDP", rev = "e4143f26306a6639a889d80c1c484ca69c365a8f" }
+ironrdp-displaycontrol = { git = "https://github.com/Devolutions/IronRDP", rev = "e4143f26306a6639a889d80c1c484ca69c365a8f" }
+
+[workspace]

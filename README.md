@@ -57,7 +57,7 @@ The Windows workbench is described in [docs/WINDOWS-WORKBENCH.md](docs/WINDOWS-W
 ## Limits
 
 - No Android client build, native FreeRDP integration, physical phone, real TLS session or real multi-monitor RDP session has been exercised by the automated tests.
-- The `FreeRDP` submodule is pinned to upstream 3.31.1 (`63b948ca5`) and is optional (`scripts/setup.sh --with-freerdp`). `patches/0001-*` applies to that commit; `patches/0002-*` (Android CMake fixes) **does not apply cleanly** to it yet (tracked in [docs/ROADMAP.md](docs/ROADMAP.md)).
+- The `FreeRDP` submodule is pinned to upstream 3.31.1 (`63b948ca5`) and is optional (`scripts/setup.sh --with-freerdp`). Both patches apply to that commit: run `bash scripts/check_patches.sh` to check without modifying the checkout. [Patch evidence](docs/verification/freerdp-patches.md) covers offline application only; Android compilation remains UNVERIFIED.
 - Design documents (`SPEC.md`, `ARCHITECTURE.md`, `docs/SECURITY_ARCHITECTURE.md`, `docs/PROTOCOL_INSIGHTS.md`) describe intent. Treat their claims as unverified unless backed by code and a test. IP addresses in them are placeholders.
 - Evidence and its limits: [docs/verification/README.md](docs/verification/README.md).
 

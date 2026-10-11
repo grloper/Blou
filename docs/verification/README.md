@@ -3,6 +3,15 @@
 Original verification date: 2026-10-01 (Windows). The suite was re-run on Linux for v0.1.0 via `scripts/verify.sh`.
 Documentation and pre-existing demo data were treated as untrusted leads. Claims below come from inspected implementation and local execution.
 
+## Rust-first follow-ups (2026-10-11)
+
+- [Workspace scaffolding](rust-workspace.md): mandatory pinned Rust gate.
+- [Portable parity](rust-parity.md): all 27 cases plus golden outputs; Python tests retained.
+- [Certificate pinning](rust-pinning.md): fixture and in-memory TLS controls, including trusted-root mismatch.
+- [Display control](display-control.md): corrected bytes, upstream cross-check and odd-width rejection.
+- [Connector prototype](rdp-config.md): all six spike cases re-run; **adoption blocked** by dependency scan. Current full gate: 41 Python + 55 Rust tests, baseline 96, exit 0. Security scans fail separately; no hardware/Android success is implied.
+- [Human gate checklists](../HARDWARE_GATES.md): Windows/phone checks remain UNVERIFIED.
+
 ## Verified use case
 
 Validate fabricated monitor layouts, map a phone viewport to a composite desktop and encode RDP display-control messages in Python.

@@ -1,10 +1,10 @@
 # Blou
 
-Blou is a pre-alpha Python project exploring **virtual multi-monitor support for a phone-sized RDP client**. The idea: the RDP client declares its monitor layout to the server, so a client can declare several virtual monitors and then let the user pan between them on a small screen.
+Blou is a pre-alpha Rust-first project exploring **virtual multi-monitor support for a phone-sized RDP client**, with a Python reference and Windows workbench. The idea: the RDP client declares its monitor layout to the server, so a client can declare several virtual monitors and then let the user pan between them on a small screen.
 
 **Status: early prototype.** What exists and is tested is a pure-Python protocol/geometry core and a Windows-only local desktop-capture workbench. There is **no working Android/RDP client** in this repository. The FreeRDP integration is a design plus two patches (see [Limits](#limits)).
 
-The Rust-first workspace now implements `blou-core` geometry, viewport/swipe mapping and fingerprint-policy parity: all 27 portable reference cases have Rust counterparts and golden vectors. Python remains the executable reference. `blou-rdp` pinning is tested with synthetic certificate fixtures and in-memory TLS, including a trusted-root mismatch control. Display-control bytes for 1–4 monitors match pinned IronRDP; odd widths are rejected. Real RDP/Android integration remains pending. IronRDP is the preferred future engine, with FreeRDP retained as fallback. The separate cargo-deny duplicate-version policy still fails on seven upstream dependency families. See [the Rust port plan](docs/RUST_PORT.md).
+The Rust-first workspace now implements `blou-core` geometry, viewport/swipe mapping and fingerprint-policy parity: all 27 portable reference cases have Rust counterparts and golden vectors. Python remains the executable reference. `blou-rdp` pinning is tested with synthetic certificate fixtures and in-memory TLS, including a trusted-root mismatch control. Display-control bytes for 1–4 monitors match pinned IronRDP; odd widths are rejected. The connector config prototype re-runs all six spike cases, but **IronRDP adoption is blocked by an unpatched RSA advisory and an unmaintained transitive dependency**; the separate duplicate-version policy also fails. Real RDP/Android integration remains pending. FreeRDP remains the fallback. See [the Rust port plan](docs/RUST_PORT.md) and [hardware checklists](docs/HARDWARE_GATES.md).
 
 ![Blou overview](docs/assets/overview.svg)
 

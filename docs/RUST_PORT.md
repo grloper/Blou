@@ -1,6 +1,6 @@
 # Rust port plan
 
-Status: all 27 portable Python cases have passing Rust counterparts and Python-generated golden vectors. Python in `src/blou/` remains the executable reference; retirement requires owner approval. Always-on pinning is proven with certificate fixtures and in-memory TLS; DVC output is corrected and byte-equal to upstream. RDP/Android integration and the upstream duplicate-dependency policy issue remain pending. See `docs/ROADMAP.md` for the ordered tasks.
+Status: all 27 portable Python cases have passing Rust counterparts and Python-generated golden vectors. Python in `src/blou/` remains the executable reference; retirement requires owner approval. Always-on pinning is proven with certificate fixtures and in-memory TLS; DVC output is corrected and byte-equal to upstream. The connector configuration prototype passes the six spike cases, but adoption is blocked by its dependency scan. RDP/Android integration remains pending. See `docs/ROADMAP.md` for the ordered tasks.
 
 Rust is pinned to 1.94.1 (including rustfmt and Clippy) in `rust-toolchain.toml`. Install rustup before `scripts/setup.sh`; setup fetches locked dependencies and the gate uses `--offline --locked`. The Python wheelhouse does not include Rust: offline setup also needs the pinned Rust toolchain and Cargo cache provisioned beforehand.
 
@@ -19,7 +19,9 @@ API references: [ring digest](https://docs.rs/ring/0.17.14/ring/digest/), [subtl
 
 `scripts/gen_vectors.py` generates `tests/vectors/portable-core.json`; Python tests require it to be reproducible and Rust compares complete output values. N5 corrected the DVC reference's MonitorLayoutSize defect (0 to 40) and replaced pixel-as-millimetre placeholders with zero (unknown/ignored). All previous assertions remain; new tests enforce the corrected fields. The adapter encodes via unmodified IronRDP, with 1..4 monitor validation and odd-width rejection before calling upstream. Core bytes match upstream for rows, grid and dimension boundaries. Golden vectors were regenerated from the corrected reference. The security reference uses synthetic bytes rather than an X.509 certificate; N4 adds actual fixture-certificate/TLS evidence separately.
 
-Supply-chain limitation: `cargo audit` passes, and cargo-deny's advisories/licenses/sources checks pass, but its duplicate-version ban fails for seven upstream dependency families. The ban remains active with no skip entries. See `docs/verification/display-control.md`; a green verification gate does not establish that this separate policy check passes.
+Supply-chain limitation: adding the connector expands the lockfile graph to 307 packages. `cargo audit` now fails for RSA's unpatched timing advisory and unmaintained atomic-polyfill through SSPI/winscard. Cargo-deny reports two advisory errors and 20 duplicate-family errors (licenses/sources pass). No ignore/skip entries were added. See `docs/verification/rdp-config.md`; a green verification gate does not establish that these separate policy checks pass. Exploit reachability in Blou's profile is UNVERIFIED, not assumed safe. FreeRDP remains the fallback; do not treat this prototype as engine adoption.
+
+`blou-rdp::config` maps immutable validated layouts into `ClientMonitorData` and checked `u16` desktop dimensions, requires a non-empty valid pin, and returns NLA-only engine settings together with the custom TLS config. The `enable_tls=false` engine flag disables TLS-only fallback, not TLS inside NLA. A synthetic TLS-only server response is rejected. No production code marks CredSSP complete; that operation occurs only in the explicitly labelled offline byte tests.
 
 ## Workspace layout (proposed)
 

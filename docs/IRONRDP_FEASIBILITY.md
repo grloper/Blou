@@ -40,6 +40,10 @@ Spike crate: `spike/ironrdp-multimon` on branch `spike/ironrdp-multimon`, pinned
 
 ## Phase 0 gate: still UNVERIFIED
 
+### N6 follow-up: configuration works offline; adoption blocked
+
+The workspace config builder re-runs all six spike cases at the same unmodified revision, plus pin/NLA/range controls. GCC bytes still match the three-monitor fixture; this does not prove Windows acceptance or authentication. Adding `ironrdp-connector` brings an audited graph containing `rsa 0.10.0-rc.18` (RUSTSEC-2023-0071, no patched upgrade) and unmaintained `atomic-polyfill 1.0.3` through SSPI/winscard. Both security scans fail; no exceptions or engine patches were added. Native Android preflight also fails in ring's C compiler setup. Details: `docs/verification/rdp-config.md`. N6 remains unchecked, FreeRDP stays as fallback, and live tests remain UNVERIFIED. Exact hardware checklists and current non-runnable steps: `docs/HARDWARE_GATES.md`.
+
 The spike proves only that IronRDP *emits* the fabricated layout. Whether Windows 11 creates 3 displays is unproven. Human checklist (needs a Windows 11 Pro host with RDP+NLA on a Tailscale address and an account allowed to log on):
 
 1. On the Windows host: Settings > System > Remote Desktop on; note the machine's tailnet address (placeholder `100.64.0.10`); confirm no existing console/RDP session for the same user (sign out other sessions).

@@ -1,8 +1,23 @@
 # Roadmap / agent backlog
 
-Direction (DR-001 in `SPEC.md`): Rust-first product. Rust core + thin Android UI, IronRDP preferred engine, FreeRDP fallback. Python in `src/blou/` is the reference until Rust parity.
+Direction: **DR-002 (proposed, gated by hardware proof)** makes GPU-capture streaming (Sunshine + Moonlight-style Android client + Tailscale) the primary product; the Rust-first RDP work (DR-001) is kept as "RDP mode" and is demoted. Research: `docs/MOONLIGHT_STACK.md`. Until the S1 proof passes and the owner accepts DR-002, S-tasks are the priority list but nothing is claimed to work.
 
-Rules: do tasks top to bottom; each has a runnable acceptance check. Finish with `scripts/verify.sh` green and read all of its output. No CI (billing blocked): merge with `[skip ci]`; never force-push `main`. Tick the box + CHANGELOG line when done. `[human]` = needs a person/hardware; an agent must stop and report, not simulate.
+Rules: do tasks top to bottom within a section; each has a runnable acceptance check. Finish with `scripts/verify.sh` green and read all of its output. No CI (billing blocked): merge with `[skip ci]`; never force-push `main`. Tick the box + CHANGELOG line when done. `[human]` = needs a person/hardware; an agent must stop and report, not simulate. GPLv3: anything derived from moonlight-android / moonlight-common-c is GPLv3 (see `docs/MOONLIGHT_STACK.md` section 10).
+
+## Streaming pivot (DR-002), primary
+- [ ] **S1 [human/hardware] Prove the stack on the owner's hardware**: stock Sunshine on the PC, stock moonlight-android on the phone, over Tailscale. Fill every TO-MEASURE row M1-M10 in `docs/MOONLIGHT_STACK.md` section 9, redacted logs under `docs/verification/`. Accept: owner reads the numbers and accepts or rejects DR-002 (gate H0). An agent without PC access must stop and report.
+- [ ] **S2 Decide: fork moonlight-android vs new app** wrapping moonlight-common-c. Write the decision (DR-003) with the GPLv3 consequences, repo layout (license files per directory), pinned upstream commits, and how upstream updates are merged. Depends on S1 (H1).
+- [ ] **S3 Tailscale discovery**: manual add by MagicDNS/tailnet IP first, then optional device listing via the Tailscale API (token in Android Keystore, never logged) with a `/serverinfo` probe to confirm Sunshine. Accept: JVM tests with a fake API/HTTP server (loopback only); `[human]` on-device check.
+- [ ] **S4 Monitor swipe**: swipe gesture sends Ctrl+Alt+Shift+F{n} to the host (verified Sunshine hotkey), indicator dots, handles frame-size change. Accept: unit tests of the gesture-to-key mapping; `[human]` check on hardware using M4/M5 results; document the pause measured.
+- [ ] **S5 Input mapping tests**: touch/pointer-to-host coordinate mapping with automated tests (reuse `blou-core` viewport math where it applies), keyboard/modifier forwarding tests, hotkey-injection tests. Accept: tests fail without the change; test count baseline raised.
+- [ ] **S6 Saved hosts + biometric lock + FLAG_SECURE**: encrypted host store (Keystore EC P-256 + BiometricPrompt, SPEC 5b), `FLAG_SECURE` on stream and host-list activities, no credential/frame logging, clipboard clear (SPEC 5c). Accept: instrumented tests; `[human]` device check.
+- [ ] **S7 Signed APK**: reproducible-as-possible release build, signing key outside the repo, GPLv3 source offer, release notes. Do not publish without owner instruction.
+- [ ] **S8 First-run polish**: onboarding for Sunshine install/pairing, Tailscale ACL guidance, clear error messages, honest README.
+- [ ] **S9 Streaming-mode security architecture**: threat model for Sunshine host exposure, tailnet ACLs, PIN pairing, input injection; extend `docs/SECURITY_ARCHITECTURE.md`.
+- [ ] **S10 RDP mode demoted**: keep the Rust core, FreeRDP/IronRDP work and Python reference building and passing the gate; the N-tasks below continue only when the owner asks. Accept: `scripts/verify.sh` green and nothing removed.
+
+## RDP mode (DR-001): demoted, kept
+These tasks are unchanged; they are no longer the priority.
 
 ## P0: Rust-first foundation
 - [x] **N1 Spike results**: offline IronRDP multi-monitor spike on branch `spike/ironrdp-multimon`, findings in `docs/IRONRDP_FEASIBILITY.md`. Accept: `cd spike/ironrdp-multimon && cargo test` = 6 passed (on that branch).

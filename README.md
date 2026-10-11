@@ -2,6 +2,8 @@
 
 Blou is a pre-alpha Python project exploring **virtual multi-monitor support for a phone-sized RDP client**. The idea: the RDP client declares its monitor layout to the server, so a client can declare several virtual monitors and then let the user pan between them on a small screen.
 
+**Direction (proposed, DR-002 in [SPEC.md](SPEC.md)):** the owner has directed Blou to pivot its primary goal to a low-latency GPU-capture streaming Android client in the style of Moonlight + Sunshine + Tailscale, with swipe between PC monitors. **This is a plan, not a feature: nothing of it exists in this repository and nothing has been run on hardware.** It is gated by a hands-on proof ([research and the measurement checklist](docs/MOONLIGHT_STACK.md); latency benefits are unmeasured). The RDP work below is kept as an alternative "RDP mode". An Android app derived from moonlight-android would be GPLv3.
+
 **Status: early prototype.** What exists and is tested is a pure-Python protocol/geometry core and a Windows-only local desktop-capture workbench. There is **no working Android/RDP client** in this repository. The FreeRDP integration is a design plus two patches (see [Limits](#limits)).
 
 The Rust-first workspace now implements `blou-core` geometry, viewport/swipe mapping and fingerprint-policy parity: all 27 portable reference cases have Rust counterparts and golden vectors. Python remains the executable reference. `blou-rdp` pinning is tested with synthetic certificate fixtures and in-memory TLS, including a trusted-root mismatch control. Display-control bytes for 1–4 monitors match pinned IronRDP; odd widths are rejected. Real RDP/Android integration remains pending. IronRDP is the preferred future engine, with FreeRDP retained as fallback. Cargo-deny reports duplicate versions of seven upstream dependency families as warnings (owner decision; no exceptions). See [the Rust port plan](docs/RUST_PORT.md).
@@ -64,8 +66,8 @@ The Windows workbench is described in [docs/WINDOWS-WORKBENCH.md](docs/WINDOWS-W
 
 ## Project docs
 
-[ROADMAP](docs/ROADMAP.md) · [CONTRIBUTING](CONTRIBUTING.md) · [SECURITY](SECURITY.md) · [CHANGELOG](CHANGELOG.md) · [AGENTS.md](AGENTS.md) (instructions for AI coding agents)
+[ROADMAP](docs/ROADMAP.md) · [Streaming research](docs/MOONLIGHT_STACK.md) · [CONTRIBUTING](CONTRIBUTING.md) · [SECURITY](SECURITY.md) · [CHANGELOG](CHANGELOG.md) · [AGENTS.md](AGENTS.md) (instructions for AI coding agents)
 
 ## License
 
-Apache License 2.0, see [LICENSE](LICENSE). FreeRDP (the optional submodule, also Apache-2.0) is a separate work under its own license and is not included in the Python package.
+Apache License 2.0, see [LICENSE](LICENSE). If the streaming pivot (DR-002) leads to an Android app derived from moonlight-android or linking moonlight-common-c (both GPL-3.0), that app would be distributed under GPLv3; see [the analysis](docs/MOONLIGHT_STACK.md#10-gplv3-implications). FreeRDP (the optional submodule, also Apache-2.0) is a separate work under its own license and is not included in the Python package.

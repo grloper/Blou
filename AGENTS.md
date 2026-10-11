@@ -5,7 +5,9 @@ Instructions for AI coding agents (OpenAI Codex cloud/CLI, and any other) and hu
 ## What this project is
 Blou: pre-alpha Python library exploring virtual multi-monitor display geometry for a phone-sized RDP client, plus a Windows-only local desktop workbench. No Android/RDP client exists yet. Do not write docs or code comments that claim otherwise.
 
-Direction (DR-001 in `SPEC.md`, adopted by the owner): Rust-first. Rust core + thin Android UI, IronRDP as preferred RDP engine, FreeRDP kept as fallback until gates pass. The Python package remains the reference; portable Rust test parity is proven, retirement not yet performed. Read `docs/IRONRDP_FEASIBILITY.md` (evidence, UNVERIFIED items) and `docs/RUST_PORT.md` (layout, test mapping) first. The Phase 0 gate (Windows accepts a fabricated multi-monitor layout) is still UNVERIFIED; never claim it.
+Primary direction (DR-002 in `SPEC.md`, PROPOSED, gated by a hardware proof): GPU-capture streaming client (Sunshine host + moonlight-android-style Android client + Tailscale discovery + swipe between PC monitors). Read `docs/MOONLIGHT_STACK.md` first; its measurements are TO-MEASURE and agents without access to the owner's PC must not invent numbers or mark S1 done. Nothing of streaming mode exists in the repo yet; do not claim it. Any code derived from moonlight-android / moonlight-common-c is GPLv3 (keep such code in clearly separated directories with their own license files; do not copy GPL code into the Apache-2.0 Rust crates). Do not reimplement the Moonlight/GameStream protocol. Work order: `docs/ROADMAP.md` S1-S10.
+
+RDP mode (DR-001, adopted by the owner, now demoted but kept; do not delete it): Rust-first. Rust core + thin Android UI, IronRDP as preferred RDP engine, FreeRDP kept as fallback until gates pass. The Python package remains the reference; portable Rust test parity is proven, retirement not yet performed. Read `docs/IRONRDP_FEASIBILITY.md` (evidence, UNVERIFIED items) and `docs/RUST_PORT.md` (layout, test mapping) first. The Phase 0 gate (Windows accepts a fabricated multi-monitor layout) is still UNVERIFIED; never claim it.
 
 ## Setup (once per clean sandbox)
 ```

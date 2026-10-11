@@ -19,7 +19,7 @@ API references: [ring digest](https://docs.rs/ring/0.17.14/ring/digest/), [subtl
 
 `scripts/gen_vectors.py` generates `tests/vectors/portable-core.json`; Python tests require it to be reproducible and Rust compares complete output values. N5 corrected the DVC reference's MonitorLayoutSize defect (0 to 40) and replaced pixel-as-millimetre placeholders with zero (unknown/ignored). All previous assertions remain; new tests enforce the corrected fields. The adapter encodes via unmodified IronRDP, with 1..4 monitor validation and odd-width rejection before calling upstream. Core bytes match upstream for rows, grid and dimension boundaries. Golden vectors were regenerated from the corrected reference. The security reference uses synthetic bytes rather than an X.509 certificate; N4 adds actual fixture-certificate/TLS evidence separately.
 
-Supply-chain limitation: `cargo audit` passes, and cargo-deny's advisories/licenses/sources checks pass, but its duplicate-version ban fails for seven upstream dependency families. The ban remains active with no skip entries. See `docs/verification/display-control.md`; a green verification gate does not establish that this separate policy check passes.
+Supply-chain note: `cargo audit` and `cargo deny check` pass. Duplicate versions of seven transitive families (block-buffer, const-oid, crypto-common, der, digest, spki, syn) from the pinned IronRDP rev are reported as warnings (`multiple-versions = "warn"`, owner decision: not a security advisory). No advisory ignores or skip entries exist; revisit when upstream dedupes. See `docs/verification/display-control.md`.
 
 ## Workspace layout (proposed)
 

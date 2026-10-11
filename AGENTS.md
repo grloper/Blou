@@ -5,6 +5,8 @@ Instructions for AI coding agents (OpenAI Codex cloud/CLI, and any other) and hu
 ## What this project is
 Blou: pre-alpha Python library exploring virtual multi-monitor display geometry for a phone-sized RDP client, plus a Windows-only local desktop workbench. No Android/RDP client exists yet. Do not write docs or code comments that claim otherwise.
 
+Direction (DR-001 in `SPEC.md`, proposed): Rust-first. Rust core + thin Android UI, IronRDP as preferred RDP engine, FreeRDP kept as fallback until gates pass. The Python package is the executable reference until Rust parity. Read `docs/IRONRDP_FEASIBILITY.md` (evidence, UNVERIFIED items) and `docs/RUST_PORT.md` (layout, test mapping) first. The Phase 0 gate (Windows accepts a fabricated multi-monitor layout) is still UNVERIFIED; never claim it.
+
 ## Setup (once per clean sandbox)
 ```
 scripts/setup.sh
@@ -24,8 +26,12 @@ Cloud-sandbox tip: put `scripts/setup.sh` in the environment's setup script; run
 | Types (non-blocking) | `.venv/bin/mypy --ignore-missing-imports src` |
 | Build sdist+wheel | `.venv/bin/python -m build --no-isolation` |
 | Offline demo | `.venv/bin/python scripts/demo_local.py` |
+| Rust format (once root `Cargo.toml` exists) | `cargo fmt --all -- --check` |
+| Rust lint | `cargo clippy --workspace --all-targets -- -D warnings` |
+| Rust tests | `cargo test --workspace` |
+| Rust Android target check (needs `rustup target add aarch64-linux-android`) | `cargo check --workspace --target aarch64-linux-android` |
 
-`scripts/verify.sh` runs: shell syntax, actionlint, ruff, mypy (warn only), unittest, test-integrity, demo fixture unchanged, package build. Exit 0 = pass. Read the whole output; do not infer success from partial output.
+`scripts/verify.sh` runs: shell syntax, actionlint, ruff, mypy (warn only), unittest, test-integrity, demo fixture unchanged, package build, then Rust fmt/clippy/test only if a root `Cargo.toml` and `cargo` exist (otherwise prints SKIP). Exit 0 = pass. Read the whole output; do not infer success from partial output.
 
 ## Repo map
 - `src/blou/` library: `layout.py` (monitor layouts), `viewport.py` (touch<->desktop mapping, swipe), `dvc.py` (display-control PDU encoding), `security.py` (fingerprint pinning), `desktop.py` (Windows workbench; needs Pillow, uses Windows APIs at runtime).
@@ -53,8 +59,15 @@ Cloud-sandbox tip: put `scripts/setup.sh` in the environment's setup script; run
 ## Running offline
 After `scripts/setup.sh`, `verify.sh` and all tests need no network. Tests only use loopback sockets and synthetic fixtures. If `.venv` is missing and there is no network, use the wheelhouse flow above.
 
+## Rust rules
+- Port tests first: write the Rust test from the Python case (same name, same numbers), see it fail, then implement. Use Python-generated golden vectors for parity. Keep Python until the owner approves retiring it.
+- `blou-core` must not depend on IronRDP; pin IronRDP by exact version or git rev (no branches). Never use `CertificateValidation::DangerouslyAcceptInvalidCertificate`; never add TOFU.
+- `cargo clippy ... -D warnings` and `cargo fmt` must be clean. No `unwrap()` on network/untrusted input paths. Minimise `unsafe` (JNI/FFI only, each block commented).
+- Do not run `cargo publish`. Commit `Cargo.lock` for bins/cdylib workspaces. `target/` is never committed.
+- Android/Windows steps marked `[human]` in `docs/ROADMAP.md` cannot be completed by an agent; stop and report.
+
 ## Style
-Python 3.10+ compatible syntax (no 3.11+-only features in `src/`). Standard library only in the protocol core (`layout`, `viewport`, `dvc`, `security`). Keep commits small; subjects imperative, ending in `[skip ci]`.
+Python 3.10+ compatible syntax (no 3.11+-only features in `src/`). Rust: `rustfmt` defaults, edition 2021, workspace lints. Standard library only in the protocol core (`layout`, `viewport`, `dvc`, `security`). Keep commits small; subjects imperative, ending in `[skip ci]`.
 
 ## Codex notes
 Codex reads this file automatically. Suggested environment config: setup script `scripts/setup.sh`; check command `scripts/verify.sh`; internet may be disabled after setup. Work from `docs/ROADMAP.md`, one task per PR/branch.

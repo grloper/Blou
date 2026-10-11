@@ -2,6 +2,12 @@
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follow [SemVer](https://semver.org/); 0.x means the API may change at any time.
 
+## [Unreleased]
+
+### Added
+- Docs: Rust-first decision record DR-001 (`SPEC.md`), IronRDP feasibility findings (`docs/IRONRDP_FEASIBILITY.md`), Rust port plan (`docs/RUST_PORT.md`), reprioritized `docs/ROADMAP.md`, Rust commands in `AGENTS.md`.
+- `scripts/verify.sh` runs Rust fmt/clippy/test only when a root `Cargo.toml` exists.
+
 ## [0.1.0] - 2026-10-11
 
 First open-source release. Pre-alpha.

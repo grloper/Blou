@@ -18,12 +18,12 @@ In RDP, the client monitor layout is declared by the client and not verified by 
 ---
 
 ## 3. Non-Negotiable Architectural Rules
-1. **Zero custom RDP implementation**: FreeRDP C core stays untouched except for settings injection and certificate callbacks.
+1. **Zero custom RDP implementation**: Blou does not write its own RDP protocol stack. The RDP engine is an upstream library: FreeRDP (C core untouched except for settings injection and certificate callbacks) or, per DR-001 below, IronRDP used as an unmodified dependency. Using IronRDP as a library is not a custom implementation; forking or patching its protocol code is (show the diff, rule 5).
 2. **Zero custom cryptography**: Transport is already double-encrypted via WireGuard (Curve25519) and RDP TLS. Blou only handles key storage and strict trust decisions.
 3. **No Windows-side agent or service**: Purely client-side.
 4. **Phase-by-phase gated progression**: Stop and report at every gate before proceeding.
 5. **Exact diff inspection**: Show actual diffs for any modification to FreeRDP source.
-6. **Pinned release commit**: Pin FreeRDP to a tagged release commit with minimal dependencies. No floating main branch.
+6. **Pinned release commit**: Pin the RDP engine (FreeRDP tag, or IronRDP crates.io version/git rev) to an exact version with minimal dependencies. No floating main branch.
 7. **Fast escalation on build churn**: If Android/NDK build struggles across multiple attempts, stop and surface blockers immediately.
 
 ---
@@ -63,3 +63,37 @@ In RDP, the client monitor layout is declared by the client and not verified by 
 - **5b. Hardware-Backed Credential Storage**: Android Keystore EC P-256 (StrongBox preferred, graceful fallback to TEE), `setUserAuthenticationRequired(true)`, BiometricPrompt. ECDH key agreement (`PURPOSE_AGREE_KEY`) wrapping AES-256-GCM key.
 - **5c. Attack Surface Reduction**: `FLAG_SECURE` on session activity, zero framebuffer/credential logging, clipboard clear on disconnect, zero telemetry/analytics.
 - **5d. Supply Chain**: Pinned FreeRDP release commit, verified release signature, documented minimal dependencies.
+
+---
+
+## 5. Decision Records
+
+### DR-001: Rust-first architecture, IronRDP as the preferred engine (PROPOSED, 2026-10-11)
+
+Status: proposed by the owner's direction; **not accepted until the gates below pass.** Evidence: `docs/IRONRDP_FEASIBILITY.md`. Port plan: `docs/RUST_PORT.md`. Order of work: `docs/ROADMAP.md`.
+
+**Decision.** Blou's product logic moves to a Rust core (`blou-core`: layout geometry, touch-to-framebuffer mapping, certificate pinning/verification, display-control messages; `blou-rdp`: engine adapter; `blou-android`: bridge) with a thin Android UI (Kotlin). IronRDP (MIT OR Apache-2.0, Devolutions) becomes the preferred RDP engine, replacing FreeRDP, *if and only if* it passes the gates. FreeRDP stays as the fallback and as the Phase 0 baseline until then.
+
+**Rationale.**
+- One memory-safe language for everything Blou owns (geometry, trust decisions); one test suite shared by Android and desktop tooling.
+- IronRDP is a library with the needed primitives: client monitor layout in GCC (on master), DISPLAYCONTROL DVC PDUs, NLA/CredSSP, a TLS certificate callback. The offline spike shows the generated client GCC monitor block for 3x1920x1080 is byte-exact.
+- Removes the C/CMake/NDK-OpenSSL build churn that blocked Phase 1 (see patches/ and ROADMAP R10).
+
+**Risks (honest).**
+1. `Config::monitor_layout` exists only on IronRDP master (PR #1675, 2026-08-16), not in crates.io 0.10.0 (2026-07-10). Blou would pin a git rev until a release; all IronRDP crates are 0.x with breaking changes between releases.
+2. The Phase 0 gate (Windows accepts a fabricated 3-monitor layout) is UNVERIFIED for any engine. If Windows rejects it, the product premise fails regardless of engine.
+3. No Android build, linked `.so`, or on-device run of IronRDP has been done. `ironrdp-tls` with rustls needs a C toolchain (NDK clang) for the crypto provider; Android root-store behaviour is unknown.
+4. IronRDP ships no Android bindings; the UniFFI/JNI bridge and surface rendering are Blou's own work.
+5. TLS pinning hook is a callback that runs only when normal validation fails; strict "pin or reject" semantics need a Rust test with fixture certs (and possibly a custom rustls verifier). Default IronRDP policy accepts invalid certs; Blou must force `Strict`.
+6. DISPLAYCONTROL multi-monitor needs raw PDU construction (helper is single-monitor); odd widths are silently rounded. Server behaviour for mid-session multi-monitor changes is UNVERIFIED.
+7. Rewrite risk: parity with the Python reference must be proven by ported tests before any deletion.
+8. Upstream is a commercial vendor's project; roadmap/priorities are not under Blou's control.
+
+**What changes in rule 1.** "Zero custom RDP implementation" now reads: no Blou-authored RDP protocol code. Depending on FreeRDP *or* IronRDP unmodified (version-pinned) is allowed. Blou-authored code is limited to configuration, layout/geometry, pinning policy, input mapping, and UI. Rule 2 (zero custom cryptography) is unchanged: pinning compares a SHA-256 fingerprint; TLS/CredSSP come from the engine.
+
+**Gates (all must pass before FreeRDP is removed).**
+- G0: Phase 0 on a real Windows 11 host passes with FreeRDP (baseline) and with IronRDP (checklist in `docs/IRONRDP_FEASIBILITY.md`).
+- G1: IronRDP connects with NLA from an Android build (device or emulator) with pinning enforced (mismatch rejected, tested).
+- G2: 27 portable Python test cases pass as Rust tests with golden-vector parity.
+
+**Fallback.** If G0 (IronRDP) or G1 fails, keep FreeRDP as the engine behind the same `blou-core`; the Rust core and Kotlin UI are still valid (hybrid). The Rust/Kotlin split does not depend on the engine choice.

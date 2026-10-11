@@ -54,5 +54,14 @@ assert "blou/layout.py" in names, names
 print("wheel contains blou package:", whl[0].rsplit("/", 1)[-1])
 PY
 
-printf '\nPASS: shell syntax + actionlint + ruff + unittest + test-integrity + offline demo + package build.\n'
+step "rust (fmt, clippy -D warnings, test) - only if a root Cargo.toml exists and cargo is installed"
+if [[ -f Cargo.toml ]] && command -v cargo >/dev/null 2>&1; then
+  cargo fmt --all -- --check
+  cargo clippy --workspace --all-targets -- -D warnings
+  cargo test --workspace
+else
+  echo "SKIP: no root Cargo.toml (Rust workspace not created yet) or cargo not installed"
+fi
+
+printf '\nPASS: shell syntax + actionlint + ruff + unittest + test-integrity + offline demo + package build (+ rust fmt/clippy/test when a root Cargo.toml exists).\n'
 printf 'NOT CHECKED: Windows/Android builds, FreeRDP native submodule, real remote sessions, Windows screen capture.\n'
